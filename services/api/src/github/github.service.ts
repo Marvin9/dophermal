@@ -27,6 +27,7 @@ export class GithubService {
         authorization: `token ${accessToken}`,
       },
     });
+
     return data;
   }
 }

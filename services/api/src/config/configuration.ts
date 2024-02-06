@@ -5,4 +5,7 @@ export default () => ({
     client_secret: process.env.GITHUB_OAUTH_SECRET,
     callback_url: process.env.GITHUB_OAUTH_CALLBACK_URL,
   },
+  database: {
+    path: process.env.SQLITE_DATABASE_PATH,
+  },
 });
