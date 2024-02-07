@@ -1,12 +1,14 @@
 import {Controller, Get} from '@nestjs/common';
 import {AppService} from './app.service';
+import {PublicRoute} from './shared/public-route';
 
 @Controller()
 export class AppController {
   constructor(private readonly appService: AppService) {}
 
-  @Get()
-  getHello(): string {
-    return this.appService.getHello();
+  @Get('ping')
+  @PublicRoute()
+  protected() {
+    return 'pong';
   }
 }

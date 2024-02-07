@@ -8,4 +8,7 @@ export default () => ({
   database: {
     path: process.env.SQLITE_DATABASE_PATH,
   },
+  jwt: {
+    secret: process.env.JWT_SECRET_KEY,
+  },
 });

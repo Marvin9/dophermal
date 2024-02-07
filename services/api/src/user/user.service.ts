@@ -23,6 +23,6 @@ export class UserService {
   }
 
   async insert(user: User) {
-    await this.usersRepository.insert(user);
+    return this.usersRepository.insert(user);
   }
 }
