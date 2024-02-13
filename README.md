@@ -1,7 +1,7 @@
 <center>
     <img src="./assets/whale.png" width="50" />
     <h1>dophermal</h1>
-    <h6>create ephermal environment of your Dockerfile.</h6>
+    <h6>create ephermal environment of your docker images.</h6>
 </center>
 
 > CSCI 5409 Cloud Computing Term Assignment
