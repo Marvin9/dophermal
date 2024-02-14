@@ -1,0 +1,33 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: dophermal infra
+Parameters:
+  LatestAmiId:
+    Type: 'AWS::SSM::Parameter::Value<AWS::EC2::Image::Id>'
+    Default: '/aws/service/ami-amazon-linux-latest/al2023-ami-minimal-kernel-default-x86_64'
+  PEMKey:
+    Type: String
+    Default: temporary-key-value-pair
+    Description: enter PEM key-value pair to attach
+Resources:
+  EC2Instance:
+    Type: AWS::EC2::Instance
+    Properties:
+      ImageId: !Ref LatestAmiId
+      InstanceType: t2.micro
+      KeyName: !Ref PEMKey
+      UserData: !Base64 |
+          #!/bin/bash
+          sudo yum update -y
+          sudo yum install -y docker
+          sudo service docker start
+          sudo usermod -a -G docker ec2-user
+      SecurityGroups:
+        - !Ref 'EC2SecurityGroup'
+  # TODO: update security group
+  EC2SecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Allow all inbound and outbound traffic
+      SecurityGroupIngress:
+      - CidrIp: 0.0.0.0/0
+        IpProtocol: "-1"
