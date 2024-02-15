@@ -8,7 +8,7 @@ export class AppController {
 
   @Get('ping')
   @PublicRoute()
-  protected() {
+  ping() {
     return 'pong';
   }
 }

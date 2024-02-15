@@ -13,6 +13,8 @@ import {UserModule} from './user/user.module';
 import {JwtStrategy} from './auth/jwt.strategy';
 import {APP_GUARD} from '@nestjs/core';
 import {JwtAuthGuard} from './auth/jwt-auth.guard';
+import {ContainerImageModule} from './container-image/container-image.module';
+import {ContainerConfigModule} from './container-config/container-config.module';
 
 @Module({
   imports: [
@@ -34,6 +36,8 @@ import {JwtAuthGuard} from './auth/jwt-auth.guard';
     AuthModule,
     GithubModule,
     UserModule,
+    ContainerImageModule,
+    ContainerConfigModule,
   ],
   controllers: [AppController],
   providers: [

@@ -1,6 +1,6 @@
 # Architecture
 
-<img src="../assets/architecture.svg" />
+<img src="../../assets/architecture.svg" />
 
 ## UI
 
