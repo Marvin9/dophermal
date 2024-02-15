@@ -1,4 +1,5 @@
 import {Module} from '@nestjs/common';
+import {LoggerModule} from 'nestjs-pino';
 import {TypeOrmModule} from '@nestjs/typeorm';
 import {ConfigModule, ConfigService} from '@nestjs/config';
 import {HttpModule} from '@nestjs/axios';
@@ -38,6 +39,25 @@ import {ContainerConfigModule} from './container-config/container-config.module'
     UserModule,
     ContainerImageModule,
     ContainerConfigModule,
+    LoggerModule.forRoot({
+      pinoHttp: {
+        name: 'dophermal-api',
+        level: process.env.NODE_ENV !== 'production' ? 'debug' : 'info',
+        transport:
+          process.env.NODE_ENV !== 'production'
+            ? {target: 'pino-pretty', options: {singleLine: true}}
+            : undefined,
+        redact: {
+          paths: [
+            'req.params',
+            'req.headers',
+            'req.remoteAddress',
+            'req.remotePort',
+            'res.headers',
+          ],
+        },
+      },
+    }),
   ],
   controllers: [AppController],
   providers: [
