@@ -14,4 +14,11 @@ type ContainerClientInterface interface {
 		config CoreContainerConfig,
 		upstreamConfig dophermal.ContainerConfigDto,
 	) (string, error)
+
+	Stop(ctx context.Context, containerName string) error
+
+	// deletes the container and image
+	Delete(ctx context.Context, containerName string) error
+
+	Close()
 }

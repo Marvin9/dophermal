@@ -35,7 +35,7 @@ func NewDockerContainerClient(logger *zap.Logger) (ContainerClientInterface, err
 }
 
 func (dc *dockerClient) Run(ctx context.Context, containerName string, pullImage string, config CoreContainerConfig, upstreamConfig dophermal.ContainerConfigDto) (string, error) {
-	dc.logger.Debug("running image ", zap.String("pullImage", pullImage))
+	dc.logger.Debug("running image", zap.String("pullImage", pullImage))
 
 	reader, err := dc.dockerApiClient.ImagePull(ctx, pullImage, types.ImagePullOptions{})
 
@@ -48,6 +48,11 @@ func (dc *dockerClient) Run(ctx context.Context, containerName string, pullImage
 	io.Copy(io.Discard, reader)
 
 	upstreamConfigPort, err := nat.NewPort("tcp", strconv.Itoa(int(upstreamConfig.Port)))
+
+	if err != nil {
+		return "", err
+	}
+
 	container, err := dc.dockerApiClient.ContainerCreate(ctx, &container.Config{
 		Image: pullImage,
 		Tty:   false,
@@ -63,9 +68,45 @@ func (dc *dockerClient) Run(ctx context.Context, containerName string, pullImage
 		return "", err
 	}
 
-	dc.logger.Debug("container created ", zap.String("container-id", container.ID))
+	dc.logger.Debug("container created", zap.String("container-id", container.ID))
 
-	dc.dockerApiClient.ContainerStart(ctx, container.ID, dockercontainer.StartOptions{})
+	err = dc.dockerApiClient.ContainerStart(ctx, container.ID, dockercontainer.StartOptions{})
+
+	if err != nil {
+		return "", err
+	}
 
 	return container.ID, nil
+}
+
+func (dc *dockerClient) Stop(ctx context.Context, containerName string) error {
+	dc.logger.Debug("container stop", zap.String("container-name", containerName))
+
+	return dc.dockerApiClient.ContainerStop(ctx, containerName, dockercontainer.StopOptions{})
+}
+
+func (dc *dockerClient) Delete(ctx context.Context, containerName string) error {
+	dc.logger.Debug("container remove", zap.String("container-name", containerName))
+
+	containerData, err := dc.dockerApiClient.ContainerInspect(ctx, containerName)
+
+	if err != nil {
+		return err
+	}
+
+	if err = dc.dockerApiClient.ContainerRemove(ctx, containerName, dockercontainer.RemoveOptions{}); err != nil {
+		return err
+	}
+
+	_, err = dc.dockerApiClient.ImageRemove(ctx, containerData.Image, types.ImageRemoveOptions{})
+
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (dc *dockerClient) Close() {
+	dc.dockerApiClient.Close()
 }
