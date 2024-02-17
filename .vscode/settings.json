@@ -29,5 +29,7 @@
         "!Sub scalar",
         "!Transform mapping",
         "!Ref scalar",
-    ]
+    ],
+    "go.testTimeout": "10m",
+    "go.testFlags": ["-count=1"]
 }

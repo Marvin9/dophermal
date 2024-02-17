@@ -42,7 +42,7 @@ func TestMain(t *testing.T) {
 		return
 	}
 
-	err = cli.Delete(ctx, "react-nginx")
+	err = cli.Delete(ctx, "react-nginx", container.DeleteOptions{})
 
 	if err != nil {
 		t.Error(err.Error())

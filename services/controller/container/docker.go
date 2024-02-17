@@ -85,7 +85,7 @@ func (dc *dockerClient) Stop(ctx context.Context, containerName string) error {
 	return dc.dockerApiClient.ContainerStop(ctx, containerName, dockercontainer.StopOptions{})
 }
 
-func (dc *dockerClient) Delete(ctx context.Context, containerName string) error {
+func (dc *dockerClient) Delete(ctx context.Context, containerName string, opts DeleteOptions) error {
 	dc.logger.Debug("container remove", zap.String("container-name", containerName))
 
 	containerData, err := dc.dockerApiClient.ContainerInspect(ctx, containerName)
@@ -94,11 +94,25 @@ func (dc *dockerClient) Delete(ctx context.Context, containerName string) error 
 		return err
 	}
 
-	if err = dc.dockerApiClient.ContainerRemove(ctx, containerName, dockercontainer.RemoveOptions{}); err != nil {
+	if err = dc.dockerApiClient.ContainerRemove(ctx, containerName, dockercontainer.RemoveOptions{
+		Force: opts.ForceDeleteContainer,
+	}); err != nil {
 		return err
 	}
 
-	_, err = dc.dockerApiClient.ImageRemove(ctx, containerData.Image, types.ImageRemoveOptions{})
+	containers, err := dc.dockerApiClient.ContainerList(ctx, dockercontainer.ListOptions{})
+
+	isImageBeingUsed := false
+	for _, container := range containers {
+		if container.Image == containerData.Config.Image {
+			isImageBeingUsed = true
+			break
+		}
+	}
+
+	if !isImageBeingUsed {
+		_, err = dc.dockerApiClient.ImageRemove(ctx, containerData.Image, types.ImageRemoveOptions{})
+	}
 
 	if err != nil {
 		return err
@@ -107,6 +121,6 @@ func (dc *dockerClient) Delete(ctx context.Context, containerName string) error 
 	return nil
 }
 
-func (dc *dockerClient) Close() {
-	dc.dockerApiClient.Close()
+func (dc *dockerClient) Close() error {
+	return dc.dockerApiClient.Close()
 }

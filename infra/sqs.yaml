@@ -1,0 +1,39 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: dophermal SQS queue to communicate controller <-> API
+
+Parameters:
+  DelaySeconds:
+    Type: Number
+    Default: 5
+  MaximumMessageSize:
+    Type: Number
+    Default: 51200 # 50KB
+  MessageRetentionPeriod:
+    Type: Number
+    Default: 86400 # 1 Day
+  ReceiveMessageWaitTimeSeconds:
+    Type: Number
+    Default: 5
+
+Resources:
+  # used to command controller
+  # "services/controller" is listener
+  ControllerQueue:
+    Type: AWS::SQS::Queue
+    Properties:
+      QueueName: ControllerQueue
+      DelaySeconds: !Ref DelaySeconds
+      MaximumMessageSize: !Ref MaximumMessageSize
+      MessageRetentionPeriod: !Ref MessageRetentionPeriod
+      ReceiveMessageWaitTimeSeconds: !Ref ReceiveMessageWaitTimeSeconds
+
+  # notify container status and metadata
+  # "servies/api" is listener
+  StatusQueue:
+    Type: AWS::SQS::Queue
+    Properties:
+      QueueName: StatusQueue
+      DelaySeconds: !Ref DelaySeconds
+      MaximumMessageSize: !Ref MaximumMessageSize
+      MessageRetentionPeriod: !Ref MessageRetentionPeriod
+      ReceiveMessageWaitTimeSeconds: !Ref ReceiveMessageWaitTimeSeconds
