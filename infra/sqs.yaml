@@ -13,7 +13,7 @@ Parameters:
     Default: 86400 # 1 Day
   ReceiveMessageWaitTimeSeconds:
     Type: Number
-    Default: 5
+    Default: 20
 
 Resources:
   # used to command controller
