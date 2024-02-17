@@ -1,55 +1,51 @@
 package main
 
 import (
+	"context"
 	"os"
+	"os/signal"
+	"syscall"
 
 	"github.com/joho/godotenv"
 	"go.uber.org/zap"
 )
 
 func main() {
+	ctx := context.Background()
+
+	sigs := make(chan os.Signal, 1)
+	exit := make(chan bool, 1)
+
+	signal.Notify(sigs, os.Interrupt, syscall.SIGTERM)
+
 	err := godotenv.Load()
 
 	if err != nil {
 		panic(err)
 	}
 
-	logger, err := zap.NewProduction()
+	svcFactory := NewGlobalServicesFactory()
 
-	if err != nil {
-		panic(err)
-	}
+	svcFactory.logger.Info("dophermal controller running")
 
-	if os.Getenv("ENV") == "development" {
-		logger, err = zap.NewDevelopment()
+	go func() {
+		<-sigs
 
-		if err != nil {
-			panic(err)
+		exit <- true
+	}()
+
+	// long-polling SQS
+	go func() {
+		for {
+			err = svcFactory.sqsSvc.HandleOnReceiveCommand(ctx)
+
+			if err != nil {
+				svcFactory.logger.Error("error handling SQS message", zap.Error(err))
+			}
 		}
+	}()
+
+	if <-exit {
+		svcFactory.logger.Info("exiting dophermal controller")
 	}
-
-	logger.Info("dophermal controller")
-
-	/*
-		in memory port manager
-		in memory state manager
-		connect docker
-		on - container-image-create
-			extract data - id, pull_image, config
-
-			publish - status-IN_PROGRESS, id
-			usePort(id)
-			docker run ...<config> pull_image <container-name=id> -> log stream
-			releasePort(id) if fail
-
-			publish - status-RUNNING, id
-
-		on - container-image-remove
-			extract data - id
-
-			publish - status-TERMINATING_IN_PROGRESS, id
-			docker <remove-command>
-			releasePort(id)
-			publish - status-TERMINATED, id
-	*/
 }

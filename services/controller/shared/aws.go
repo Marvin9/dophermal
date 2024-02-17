@@ -15,3 +15,8 @@ func GetAWSCreds() AWSStaticCredentials {
 		SessionToken:    os.Getenv("AWS_SESSION_TOKEN"),
 	}
 }
+
+type AWSConf struct {
+	Region string
+	Creds  AWSStaticCredentials
+}

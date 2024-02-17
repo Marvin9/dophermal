@@ -9,12 +9,13 @@ import (
 )
 
 type ListenEvents interface {
+	// creates container and provide host-port of "-p <host-port>:<container-port>" when run container
 	CreateContainerImage(ctx context.Context, dto dophermal.ContainerImageDto) (string, error)
 	RemoveContainerImage(ctx context.Context, containerName string) error
 }
 
 type PublishEvents interface {
-	UpdateContainerStatus(containerName string, status dophermal.CONTAINER_IMAGE_STATUS, port string)
+	UpdateContainerStatus(containerName string, status dophermal.CONTAINER_IMAGE_STATUS, port string) error
 }
 
 type eventService struct {
@@ -30,6 +31,8 @@ func NewEventService(hostService *host.HostService, containerClient container.Co
 }
 
 func (es *eventService) CreateContainerImage(ctx context.Context, dto dophermal.ContainerImageDto) (string, error) {
+	// TODO: verify if container already running
+
 	containerName := dto.Id
 
 	hostPort, err := es.hostService.AssignPort(containerName)
@@ -55,6 +58,7 @@ func (es *eventService) CreateContainerImage(ctx context.Context, dto dophermal.
 }
 
 func (es *eventService) RemoveContainerImage(ctx context.Context, containerName string) error {
+	// TODO: verify if container alredy stopped
 	if err := es.containerClient.Stop(ctx, containerName); err != nil {
 		return err
 	}
