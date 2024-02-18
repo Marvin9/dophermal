@@ -30,6 +30,10 @@ export class ContainerConfigService {
     return this.containerConfigRepository.save(containerConfig);
   }
 
+  listConfig(user: User) {
+    return this.containerConfigRepository.find({where: {createdBy: user}});
+  }
+
   async createRepoConfig(
     repoLevelContainerConfigDto: RepoLevelContainerConfigDto,
     user: User,
@@ -49,5 +53,13 @@ export class ContainerConfigService {
     containerConfig.createdBy = user;
 
     return this.containerConfigRepository.save(containerConfig);
+  }
+
+  listRepoConfig(user: User, repoId: string) {
+    const repoLevelContainerConfig = new RepoLevelContainerConfig();
+    repoLevelContainerConfig.id = repoId;
+    return this.containerConfigRepository.find({
+      where: {createdBy: user, id: repoId},
+    });
   }
 }

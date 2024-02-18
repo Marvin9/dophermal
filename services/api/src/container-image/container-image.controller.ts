@@ -1,8 +1,15 @@
-import {Body, Controller, Post} from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  HttpException,
+  HttpStatus,
+  Param,
+  Post,
+} from '@nestjs/common';
 import {ContainerImageService} from './container-image.service';
 import {JWTUser} from 'src/auth/jwt.decorator';
 import {ContainerImageDto} from './container-image.dto';
-import {JWTExtractDto} from 'src/auth/jwt-dto.dto';
 import {User} from 'src/user/user.entity';
 import {SqsService} from 'src/sqs/sqs.service';
 
@@ -13,15 +20,48 @@ export class ContainerImageController {
     private readonly sqsSvc: SqsService,
   ) {}
 
+  @Get()
+  async list(@JWTUser() user: User) {
+    return this.containerImageService.listByUser(user);
+  }
+
+  @Get('repo/:repo')
+  async listByRepo(@JWTUser() user: User, @Param('repo') repo: string) {
+    return this.containerImageService.listByRepo(user, repo);
+  }
+
+  @Get('/image/:id')
+  async getById(@JWTUser() user: User, @Param('id') containerImageId: string) {
+    return this.containerImageService.getByImageId(user, containerImageId);
+  }
+
+  @Get('repo/:repo/pr/:pr')
+  async getByPullRequest(
+    @JWTUser() user: User,
+    @Param('repo') repo: string,
+    @Param('pr') prNumber: number,
+  ) {
+    return this.containerImageService.getByPullRequest(user, repo, prNumber);
+  }
+
   @Post()
   async create(
-    @JWTUser() jwt: JWTExtractDto,
+    @JWTUser() user: User,
     @Body() containerImage: ContainerImageDto,
   ) {
-    const user = new User();
-    user.id = jwt.id;
-    user.email = jwt.email;
-    user.username = jwt.username;
+    const isPullRequestActive =
+      await this.containerImageService.isPullRequestActive(
+        containerImage.githubRepoName,
+        containerImage.pullRequestNumber,
+        user,
+      );
+
+    if (isPullRequestActive) {
+      throw new HttpException(
+        `${containerImage.githubRepoName}/${containerImage.pullRequestNumber} has already attached container image`,
+        HttpStatus.CONFLICT,
+      );
+    }
 
     const newContainerImage = await this.containerImageService.createImage(
       containerImage,

@@ -34,4 +34,42 @@ export class ContainerImageService {
       port,
     });
   }
+
+  isPullRequestActive(repo: string, pullRequestNumber: number, user: User) {
+    const query = new ContainerImage();
+    query.githubRepoName = repo;
+    query.pullRequestNumber = pullRequestNumber;
+    query.createdBy = user;
+
+    return this.containerImageRepository.exists({where: query});
+  }
+
+  listByUser(user: User) {
+    return this.containerImageRepository.find({where: {createdBy: user}});
+  }
+
+  listByRepo(user: User, repo: string) {
+    return this.containerImageRepository.find({
+      where: {createdBy: user, githubRepoName: repo},
+    });
+  }
+
+  getByImageId(user: User, imageId: string) {
+    return this.containerImageRepository.find({
+      where: {
+        createdBy: user,
+        id: imageId,
+      },
+    });
+  }
+
+  getByPullRequest(user: User, repo: string, pr: number) {
+    return this.containerImageRepository.find({
+      where: {
+        createdBy: user,
+        githubRepoName: repo,
+        pullRequestNumber: pr,
+      },
+    });
+  }
 }
