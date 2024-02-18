@@ -1,6 +1,6 @@
 import {Injectable} from '@nestjs/common';
 import {InjectRepository} from '@nestjs/typeorm';
-import {ContainerImage} from './container-image.entity';
+import {CONTAINER_IMAGE_STATUS, ContainerImage} from './container-image.entity';
 import {Repository} from 'typeorm';
 import {ContainerImageDto} from './container-image.dto';
 import {User} from 'src/user/user.entity';
@@ -26,5 +26,12 @@ export class ContainerImageService {
     containerImage.pullRequestNumber = image.pullRequestNumber;
 
     return this.containerImageRepository.save(containerImage);
+  }
+
+  updateImageStatus(id: string, status: CONTAINER_IMAGE_STATUS, port?: number) {
+    return this.containerImageRepository.update(id, {
+      status,
+      port,
+    });
   }
 }

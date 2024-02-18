@@ -3,6 +3,9 @@ import {LoggerModule} from 'nestjs-pino';
 import {TypeOrmModule} from '@nestjs/typeorm';
 import {ConfigModule, ConfigService} from '@nestjs/config';
 import {HttpModule} from '@nestjs/axios';
+import {APP_GUARD} from '@nestjs/core';
+import {EventEmitterModule} from '@nestjs/event-emitter';
+
 import {AppController} from './app.controller';
 import {AppService} from './app.service';
 import {AuthModule} from './auth/auth.module';
@@ -12,10 +15,10 @@ import {GithubService} from './github/github.service';
 import {GithubModule} from './github/github.module';
 import {UserModule} from './user/user.module';
 import {JwtStrategy} from './auth/jwt.strategy';
-import {APP_GUARD} from '@nestjs/core';
 import {JwtAuthGuard} from './auth/jwt-auth.guard';
 import {ContainerImageModule} from './container-image/container-image.module';
 import {ContainerConfigModule} from './container-config/container-config.module';
+import {SqsModule} from './sqs/sqs.module';
 
 @Module({
   imports: [
@@ -23,22 +26,6 @@ import {ContainerConfigModule} from './container-config/container-config.module'
       load: [configuration],
       isGlobal: true,
     }),
-    HttpModule,
-    TypeOrmModule.forRootAsync({
-      imports: [ConfigModule],
-      useFactory: async (configService: ConfigService) => ({
-        type: 'sqlite',
-        database: configService.get('database.path'),
-        autoLoadEntities: true,
-        synchronize: true,
-      }),
-      inject: [ConfigService],
-    }),
-    AuthModule,
-    GithubModule,
-    UserModule,
-    ContainerImageModule,
-    ContainerConfigModule,
     LoggerModule.forRoot({
       pinoHttp: {
         name: 'dophermal-api',
@@ -58,6 +45,24 @@ import {ContainerConfigModule} from './container-config/container-config.module'
         },
       },
     }),
+    HttpModule,
+    TypeOrmModule.forRootAsync({
+      imports: [ConfigModule],
+      useFactory: async (configService: ConfigService) => ({
+        type: 'sqlite',
+        database: configService.get('database.path'),
+        autoLoadEntities: true,
+        synchronize: true,
+      }),
+      inject: [ConfigService],
+    }),
+    AuthModule,
+    GithubModule,
+    UserModule,
+    ContainerImageModule,
+    ContainerConfigModule,
+    SqsModule,
+    EventEmitterModule.forRoot(),
   ],
   controllers: [AppController],
   providers: [

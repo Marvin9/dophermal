@@ -11,4 +11,14 @@ export default () => ({
   jwt: {
     secret: process.env.JWT_SECRET_KEY,
   },
+  aws: {
+    region: process.env.AWS_REGION,
+    accessKeyId: process.env.AWS_ACCESS_KEY_ID,
+    accessKeySecret: process.env.AWS_SECRET_ACCESS_KEY,
+    sessionToken: process.env.AWS_SESSION_TOKEN,
+  },
+  sqs: {
+    controllerQueue: process.env.CONTROLLER_SQS_QUEUE_NAME,
+    statusQueue: process.env.STATUS_SQS_QUEUE_NAME,
+  },
 });

@@ -44,4 +44,9 @@ export class ContainerImage {
     default: CONTAINER_IMAGE_STATUS.INITIATED,
   })
   status: CONTAINER_IMAGE_STATUS;
+
+  @Column({
+    nullable: true,
+  })
+  port: number;
 }
