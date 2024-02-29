@@ -1,4 +1,11 @@
-import {Controller, Get, Query, UseGuards} from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  HttpException,
+  HttpStatus,
+  Query,
+  UseGuards,
+} from '@nestjs/common';
 import {AuthGuard} from '@nestjs/passport';
 import {GithubService} from 'src/github/github.service';
 import {UserService} from 'src/user/user.service';
@@ -39,5 +46,10 @@ export class AuthController {
 
       return this.authService.login(newOrExistingUser, accessToken);
     }
+
+    throw new HttpException(
+      'requires provide a `code` in query parameter',
+      HttpStatus.BAD_REQUEST,
+    );
   }
 }
