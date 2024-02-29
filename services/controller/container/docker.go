@@ -55,7 +55,7 @@ func (dc *dockerClient) Run(ctx context.Context, containerName string, pullImage
 
 	container, err := dc.dockerApiClient.ContainerCreate(ctx, &container.Config{
 		Image: pullImage,
-		Tty:   false,
+		Tty:   true,
 	}, &dockercontainer.HostConfig{PortBindings: nat.PortMap{
 		upstreamConfigPort: []nat.PortBinding{
 			{
