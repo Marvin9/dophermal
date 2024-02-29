@@ -2,6 +2,7 @@ package container
 
 import (
 	"context"
+	"io"
 
 	"github.com/Marvin9/dophermal/services/controller/dophermal"
 )
@@ -25,4 +26,6 @@ type ContainerClientInterface interface {
 	Delete(ctx context.Context, containerName string, deleteOpts DeleteOptions) error
 
 	Close() error
+
+	ContainerLogs(ctx context.Context, containerId string) (io.ReadCloser, error)
 }

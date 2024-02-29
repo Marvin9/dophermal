@@ -85,6 +85,22 @@ func (dc *dockerClient) Stop(ctx context.Context, containerName string) error {
 	return dc.dockerApiClient.ContainerStop(ctx, containerName, dockercontainer.StopOptions{})
 }
 
+func (dc *dockerClient) ContainerLogs(ctx context.Context, containerId string) (io.ReadCloser, error) {
+	dc.logger.Debug("container logs", zap.String("contaienr-id", containerId))
+
+	reader, err := dc.dockerApiClient.ContainerLogs(ctx, containerId, dockercontainer.LogsOptions{
+		Follow:     true,
+		ShowStdout: true,
+		ShowStderr: true,
+	})
+
+	if err != nil {
+		return reader, err
+	}
+
+	return reader, nil
+}
+
 func (dc *dockerClient) Delete(ctx context.Context, containerName string, opts DeleteOptions) error {
 	dc.logger.Debug("container remove", zap.String("container-name", containerName))
 

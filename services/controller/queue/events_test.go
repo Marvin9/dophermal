@@ -7,7 +7,9 @@ import (
 	"github.com/Marvin9/dophermal/services/controller/container"
 	"github.com/Marvin9/dophermal/services/controller/dophermal"
 	"github.com/Marvin9/dophermal/services/controller/host"
+	logstream "github.com/Marvin9/dophermal/services/controller/log-stream"
 	"github.com/Marvin9/dophermal/services/controller/queue"
+	"github.com/Marvin9/dophermal/services/controller/shared"
 	"github.com/Marvin9/dophermal/services/controller/state"
 	"go.uber.org/zap"
 )
@@ -31,7 +33,13 @@ func TestRunningSingleContainer(t *testing.T) {
 
 	hostService := host.NewHostService(inMemoryState, logger)
 
-	events := queue.NewEventService(hostService, cli)
+	s3LogStreamSvc, err := logstream.NewS3LogStream(1024, shared.GetAWSConf(), logger)
+
+	if err != nil {
+		t.Error(err)
+	}
+
+	events := queue.NewEventService(hostService, cli, s3LogStreamSvc, logger)
 
 	_, err = events.CreateContainerImage(ctx, dophermal.ContainerImageDto{
 		Id:        "react-nginx",
@@ -103,7 +111,13 @@ func TestRunningMultiContainer(t *testing.T) {
 
 	hostService := host.NewHostService(inMemoryState, logger)
 
-	events := queue.NewEventService(hostService, cli)
+	s3LogStreamSvc, err := logstream.NewS3LogStream(1024, shared.GetAWSConf(), logger)
+
+	if err != nil {
+		t.Error(err)
+	}
+
+	events := queue.NewEventService(hostService, cli, s3LogStreamSvc, logger)
 
 	_, err = events.CreateContainerImage(ctx, dophermal.ContainerImageDto{
 		Id:        "react-nginx",

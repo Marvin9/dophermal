@@ -5,6 +5,7 @@ import (
 
 	"github.com/Marvin9/dophermal/services/controller/container"
 	"github.com/Marvin9/dophermal/services/controller/host"
+	logstream "github.com/Marvin9/dophermal/services/controller/log-stream"
 	"github.com/Marvin9/dophermal/services/controller/queue"
 	"github.com/Marvin9/dophermal/services/controller/shared"
 	"github.com/Marvin9/dophermal/services/controller/state"
@@ -18,9 +19,10 @@ type GlobalServicesFactory struct {
 	containerSvc container.ContainerClientInterface
 	eventSvc     queue.ListenEvents
 	sqsSvc       queue.QueueInterface
+	logStreamSvc logstream.ContainerLogStreamInterface
 }
 
-func NewGlobalServicesFactory() *GlobalServicesFactory {
+func newGlobalServicesFactory(ignoreSqs bool) *GlobalServicesFactory {
 	logger, err := zap.NewProduction()
 
 	if err != nil {
@@ -36,28 +38,37 @@ func NewGlobalServicesFactory() *GlobalServicesFactory {
 	}
 	stateManager := state.NewInMemoryState()
 
-	hostSvc := host.NewHostService(stateManager, logger)
+	hostSvc := host.NewHostService(stateManager, logger.Named("host-service"))
 
-	containerSvc, err := container.NewDockerContainerClient(logger)
+	containerSvc, err := container.NewDockerContainerClient(logger.Named("docker-container-client-service"))
 
 	if err != nil {
 		logger.Error("error initializing container service")
 		panic(err)
 	}
 
-	eventSvc := queue.NewEventService(hostSvc, containerSvc)
-
-	sqsSvc, err := queue.NewSqsService(shared.AWSConf{
-		Creds:  shared.GetAWSCreds(),
-		Region: "us-east-1",
-	}, eventSvc, logger, queue.RequiredQueues{
-		ControllerQueue: os.Getenv("CONTROLLER_SQS_QUEUE_NAME"),
-		StatusQueue:     os.Getenv("STATUS_SQS_QUEUE_NAME"),
-	})
+	logStreamSvc, err := logstream.NewS3LogStream(shared.GetContainerLogStreamChunkSize(), shared.GetAWSConf(), logger.Named("s3-log-stream"))
 
 	if err != nil {
-		logger.Error("error initializing SQS service")
+		logger.Error("error initializing S3 service")
 		panic(err)
+	}
+
+	eventSvc := queue.NewEventService(hostSvc, containerSvc, logStreamSvc, logger.Named("event-service"))
+
+	var sqsSvc queue.QueueInterface
+	if !ignoreSqs {
+		sqsSvc, err = queue.NewSqsService(
+			shared.GetAWSConf(), eventSvc, logger.Named("sqs-service"),
+			queue.RequiredQueues{
+				ControllerQueue: os.Getenv("CONTROLLER_SQS_QUEUE_NAME"),
+				StatusQueue:     os.Getenv("STATUS_SQS_QUEUE_NAME"),
+			})
+
+		if err != nil {
+			logger.Error("error initializing SQS service")
+			panic(err)
+		}
 	}
 
 	return &GlobalServicesFactory{
@@ -67,5 +78,10 @@ func NewGlobalServicesFactory() *GlobalServicesFactory {
 		containerSvc: containerSvc,
 		eventSvc:     eventSvc,
 		sqsSvc:       sqsSvc,
+		logStreamSvc: logStreamSvc,
 	}
+}
+
+func NewGlobalServicesFactory() *GlobalServicesFactory {
+	return newGlobalServicesFactory(false)
 }
