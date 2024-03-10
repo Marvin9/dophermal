@@ -82,20 +82,6 @@ export class ContainerImageController {
     @JWTUser() user: User,
     @Body() containerImage: ContainerImageDto,
   ) {
-    const isPullRequestActive =
-      await this.containerImageService.isPullRequestActive(
-        containerImage.githubRepoName,
-        containerImage.pullRequestNumber,
-        user,
-      );
-
-    if (isPullRequestActive) {
-      throw new HttpException(
-        `${containerImage.githubRepoName}/${containerImage.pullRequestNumber} has already attached container image`,
-        HttpStatus.CONFLICT,
-      );
-    }
-
     const containerConfig = await this.containerConfigService.getConfigById(
       user,
       containerImage?.containerConfigurationId,

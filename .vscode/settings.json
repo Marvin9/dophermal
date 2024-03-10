@@ -7,6 +7,10 @@
         {
             "directory": "./services/api",
             "!cwd": false
+        },
+        {
+            "directory": "./services/ui",
+            "!cwd": false
         }
     ],
     "yaml.customTags": [
@@ -31,5 +35,6 @@
         "!Ref scalar",
     ],
     "go.testTimeout": "10m",
-    "go.testFlags": ["-count=1"]
+    "go.testFlags": ["-count=1"],
+    "less.lint.unknownAtRules": "ignore"
 }

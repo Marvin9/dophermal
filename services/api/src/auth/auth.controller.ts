@@ -11,6 +11,8 @@ import {GithubService} from 'src/github/github.service';
 import {UserService} from 'src/user/user.service';
 import {AuthService} from './auth.service';
 import {PublicRoute} from 'src/shared/public-route';
+import {JWTUser} from './jwt.decorator';
+import {User} from 'src/user/user.entity';
 
 @Controller('auth')
 export class AuthController {
@@ -25,9 +27,15 @@ export class AuthController {
   @Get('login')
   async login() {}
 
+  @Get('info')
+  @PublicRoute()
+  authUserInfo(@JWTUser() user: User) {
+    return user;
+  }
+
   @Get('callback')
   @PublicRoute()
-  async callback(@Query('code') code) {
+  async callback(@Query('code') code: string) {
     if (code) {
       const accessToken = await this.githubService.getGithubAccessToken(code);
       const user = await this.githubService.getUserFromAccessToken(accessToken);

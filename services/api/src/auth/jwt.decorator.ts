@@ -18,6 +18,10 @@ export const JWTUser = createParamDecorator(
 
     const user = new User();
 
+    if (!jwtExtract) {
+      return user;
+    }
+
     user.id = jwtExtract.id;
     user.email = jwtExtract.email;
     user.username = jwtExtract.username;
