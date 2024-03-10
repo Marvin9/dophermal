@@ -55,11 +55,24 @@ export class ContainerConfigService {
     return this.containerConfigRepository.save(containerConfig);
   }
 
+  getConfigById(user: User, id: string) {
+    const containerConfig = new ContainerConfig();
+    containerConfig.createdBy = user;
+    containerConfig.id = id;
+    return this.containerConfigRepository.findOne({where: containerConfig});
+  }
+
   listRepoConfig(user: User, repoId: string) {
     const repoLevelContainerConfig = new RepoLevelContainerConfig();
     repoLevelContainerConfig.id = repoId;
     return this.containerConfigRepository.find({
       where: {createdBy: user, id: repoId},
+    });
+  }
+
+  configExists(user: User, configId: string) {
+    return this.containerConfigRepository.exists({
+      where: {id: configId, createdBy: user},
     });
   }
 }

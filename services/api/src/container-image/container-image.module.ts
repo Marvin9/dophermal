@@ -4,10 +4,21 @@ import {ContainerImage} from './container-image.entity';
 import {ContainerImageController} from './container-image.controller';
 import {ContainerImageService} from './container-image.service';
 import {SqsService} from 'src/sqs/sqs.service';
+import {ContainerConfigModule} from 'src/container-config/container-config.module';
+import {ContainerConfigService} from 'src/container-config/container-config.service';
+import {
+  ContainerConfig,
+  RepoLevelContainerConfig,
+} from 'src/container-config/container-config.entity';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([ContainerImage])],
+  imports: [
+    TypeOrmModule.forFeature([ContainerImage]),
+    ContainerConfigModule,
+    TypeOrmModule.forFeature([ContainerConfig]),
+    TypeOrmModule.forFeature([RepoLevelContainerConfig]),
+  ],
   controllers: [ContainerImageController],
-  providers: [ContainerImageService, SqsService],
+  providers: [ContainerImageService, SqsService, ContainerConfigService],
 })
 export class ContainerImageModule {}

@@ -35,13 +35,26 @@ export class ContainerImageService {
     });
   }
 
+  batchUpdateImageStatus(id: string[], status: CONTAINER_IMAGE_STATUS) {
+    return this.containerImageRepository.update(id, {status});
+  }
+
   isPullRequestActive(repo: string, pullRequestNumber: number, user: User) {
     const query = new ContainerImage();
     query.githubRepoName = repo;
     query.pullRequestNumber = pullRequestNumber;
     query.createdBy = user;
 
-    return this.containerImageRepository.exists({where: query});
+    const queryByStatus = [
+      CONTAINER_IMAGE_STATUS.INITIATED,
+      CONTAINER_IMAGE_STATUS.IN_PROGRESS,
+      CONTAINER_IMAGE_STATUS.RUNNING,
+    ].map((status) => {
+      query.status = status;
+      return query;
+    });
+
+    return this.containerImageRepository.exists({where: queryByStatus});
   }
 
   listByUser(user: User) {
@@ -55,12 +68,31 @@ export class ContainerImageService {
   }
 
   getByImageId(user: User, imageId: string) {
-    return this.containerImageRepository.find({
+    return this.containerImageRepository.findOne({
       where: {
         createdBy: user,
         id: imageId,
       },
     });
+  }
+
+  imageIdExists(user: User, imageId: string) {
+    return this.containerImageRepository.exists({
+      where: {
+        createdBy: user,
+        id: imageId,
+      },
+    });
+  }
+
+  softDeleteContainerImage(user: User, imageId: string) {
+    const containerImage = new ContainerImage();
+
+    containerImage.createdBy = user;
+    containerImage.id = imageId;
+    containerImage.status = CONTAINER_IMAGE_STATUS.TERMINATED;
+
+    return this.containerImageRepository.save(containerImage);
   }
 
   getByPullRequest(user: User, repo: string, pr: number) {
