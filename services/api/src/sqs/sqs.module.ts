@@ -27,6 +27,11 @@ export class SqsModule {
     private readonly eventEmitter: EventEmitter2,
     private readonly containerImageSvc: ContainerImageService,
   ) {
+    if (configService.get('sqs.disable')) {
+      this.logger.log('sqs is disabled');
+      return;
+    }
+
     this.sqsClient = new SQSClient({
       region: configService.get('aws.region'),
       credentials: {

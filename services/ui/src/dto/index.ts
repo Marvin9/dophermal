@@ -3,3 +3,8 @@ export type User = {
   email: string;
   username: string;
 };
+
+export type OAuth2GithubConf = {
+  clientID: string;
+  scope: string[];
+};

@@ -13,6 +13,7 @@ import {AuthService} from './auth.service';
 import {PublicRoute} from 'src/shared/public-route';
 import {JWTUser} from './jwt.decorator';
 import {User} from 'src/user/user.entity';
+import {ConfigService} from '@nestjs/config';
 
 @Controller('auth')
 export class AuthController {
@@ -20,6 +21,7 @@ export class AuthController {
     private readonly githubService: GithubService,
     private readonly userService: UserService,
     private readonly authService: AuthService,
+    private readonly configService: ConfigService,
   ) {}
 
   @UseGuards(AuthGuard('github'))
@@ -27,8 +29,16 @@ export class AuthController {
   @Get('login')
   async login() {}
 
-  @Get('info')
   @PublicRoute()
+  @Get('oauth2/github')
+  async getGithub() {
+    return {
+      clientID: this.configService.get('github.client_id'),
+      scope: ['read:user', 'repo'],
+    };
+  }
+
+  @Get('info')
   authUserInfo(@JWTUser() user: User) {
     return user;
   }

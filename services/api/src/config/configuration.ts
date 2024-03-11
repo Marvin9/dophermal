@@ -20,5 +20,6 @@ export default () => ({
   sqs: {
     controllerQueue: process.env.CONTROLLER_SQS_QUEUE_NAME,
     statusQueue: process.env.STATUS_SQS_QUEUE_NAME,
+    disable: process.env.DISABLE_SQS,
   },
 });
