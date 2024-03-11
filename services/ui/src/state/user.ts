@@ -1,5 +1,6 @@
 import {create} from 'zustand';
 import {User} from '@ui/dto';
+import {removeBearer} from '@ui/lib/auth';
 
 interface UserState {
   authenticated: boolean;
@@ -21,5 +22,9 @@ export const useUserStore = create<UserState>()((set) => ({
       };
     }),
 
-  logout: () => set(() => ({authenticated: false, user: null})),
+  logout: () =>
+    set(() => {
+      removeBearer();
+      return {authenticated: false, user: null};
+    }),
 }));

@@ -15,7 +15,8 @@ import { Route as ProtectedImport } from './routes/_protected'
 import { Route as IndexImport } from './routes/index'
 import { Route as AuthLoginImport } from './routes/auth/login'
 import { Route as AuthCallbackImport } from './routes/auth/callback'
-import { Route as ProtectedDashboardImport } from './routes/_protected/dashboard'
+import { Route as ProtectedDashboardLayoutImport } from './routes/_protected/_dashboard-layout'
+import { Route as ProtectedDashboardLayoutDashboardIndexImport } from './routes/_protected/_dashboard-layout/dashboard/index'
 
 // Create/Update Routes
 
@@ -39,10 +40,16 @@ const AuthCallbackRoute = AuthCallbackImport.update({
   getParentRoute: () => rootRoute,
 } as any)
 
-const ProtectedDashboardRoute = ProtectedDashboardImport.update({
-  path: '/dashboard',
+const ProtectedDashboardLayoutRoute = ProtectedDashboardLayoutImport.update({
+  id: '/_dashboard-layout',
   getParentRoute: () => ProtectedRoute,
 } as any)
+
+const ProtectedDashboardLayoutDashboardIndexRoute =
+  ProtectedDashboardLayoutDashboardIndexImport.update({
+    path: '/dashboard/',
+    getParentRoute: () => ProtectedDashboardLayoutRoute,
+  } as any)
 
 // Populate the FileRoutesByPath interface
 
@@ -56,8 +63,8 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProtectedImport
       parentRoute: typeof rootRoute
     }
-    '/_protected/dashboard': {
-      preLoaderRoute: typeof ProtectedDashboardImport
+    '/_protected/_dashboard-layout': {
+      preLoaderRoute: typeof ProtectedDashboardLayoutImport
       parentRoute: typeof ProtectedImport
     }
     '/auth/callback': {
@@ -68,6 +75,10 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthLoginImport
       parentRoute: typeof rootRoute
     }
+    '/_protected/_dashboard-layout/dashboard/': {
+      preLoaderRoute: typeof ProtectedDashboardLayoutDashboardIndexImport
+      parentRoute: typeof ProtectedDashboardLayoutImport
+    }
   }
 }
 
@@ -75,7 +86,11 @@ declare module '@tanstack/react-router' {
 
 export const routeTree = rootRoute.addChildren([
   IndexRoute,
-  ProtectedRoute.addChildren([ProtectedDashboardRoute]),
+  ProtectedRoute.addChildren([
+    ProtectedDashboardLayoutRoute.addChildren([
+      ProtectedDashboardLayoutDashboardIndexRoute,
+    ]),
+  ]),
   AuthCallbackRoute,
   AuthLoginRoute,
 ])

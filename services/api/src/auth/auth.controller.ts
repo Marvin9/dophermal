@@ -55,7 +55,7 @@ export class AuthController {
       const newOrExistingUser = userExists || {
         id: user.id,
         email: user.email,
-        username: user.name,
+        username: user.login,
       };
 
       if (!userExists) {
