@@ -15,3 +15,14 @@ export type GithubRepo = {
   full_name: string;
   html_url: string;
 };
+
+export type GithubPullRequest = {
+  id: number;
+  html_url: string;
+  number: number;
+  title: string;
+  user: {
+    login: string;
+  };
+  created_at: string;
+};

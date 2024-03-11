@@ -17,6 +17,7 @@ import { Route as AuthLoginImport } from './routes/auth/login'
 import { Route as AuthCallbackImport } from './routes/auth/callback'
 import { Route as ProtectedDashboardLayoutImport } from './routes/_protected/_dashboard-layout'
 import { Route as ProtectedDashboardLayoutDashboardIndexImport } from './routes/_protected/_dashboard-layout/dashboard/index'
+import { Route as ProtectedDashboardLayoutDashboardRepoOwnerRepoNameImport } from './routes/_protected/_dashboard-layout/dashboard/repo/$owner/$repoName'
 
 // Create/Update Routes
 
@@ -51,6 +52,12 @@ const ProtectedDashboardLayoutDashboardIndexRoute =
     getParentRoute: () => ProtectedDashboardLayoutRoute,
   } as any)
 
+const ProtectedDashboardLayoutDashboardRepoOwnerRepoNameRoute =
+  ProtectedDashboardLayoutDashboardRepoOwnerRepoNameImport.update({
+    path: '/dashboard/repo/$owner/$repoName',
+    getParentRoute: () => ProtectedDashboardLayoutRoute,
+  } as any)
+
 // Populate the FileRoutesByPath interface
 
 declare module '@tanstack/react-router' {
@@ -79,6 +86,10 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProtectedDashboardLayoutDashboardIndexImport
       parentRoute: typeof ProtectedDashboardLayoutImport
     }
+    '/_protected/_dashboard-layout/dashboard/repo/$owner/$repoName': {
+      preLoaderRoute: typeof ProtectedDashboardLayoutDashboardRepoOwnerRepoNameImport
+      parentRoute: typeof ProtectedDashboardLayoutImport
+    }
   }
 }
 
@@ -89,6 +100,7 @@ export const routeTree = rootRoute.addChildren([
   ProtectedRoute.addChildren([
     ProtectedDashboardLayoutRoute.addChildren([
       ProtectedDashboardLayoutDashboardIndexRoute,
+      ProtectedDashboardLayoutDashboardRepoOwnerRepoNameRoute,
     ]),
   ]),
   AuthCallbackRoute,

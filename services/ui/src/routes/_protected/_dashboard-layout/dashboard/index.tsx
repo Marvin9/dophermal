@@ -1,5 +1,5 @@
 import {useQuery} from '@tanstack/react-query';
-import {createFileRoute} from '@tanstack/react-router';
+import {createFileRoute, useNavigate} from '@tanstack/react-router';
 import {queries} from '@ui/api/queries';
 import {ReactNode, useMemo, useState} from 'react';
 
@@ -24,6 +24,8 @@ import {PlusIcon} from '@radix-ui/react-icons';
 import {Input} from '@ui/components/shared/ui/input';
 
 const Dashboard = () => {
+  const navigate = useNavigate();
+
   const {data: repos, isLoading, error} = useQuery(queries.github.repos());
 
   const [search, setSearch] = useState('');
@@ -64,7 +66,16 @@ const Dashboard = () => {
               <CardDescription>{repo.full_name}</CardDescription>
             </CardHeader>
             <CardContent className="mt-auto">
-              <Button variant="outline">
+              <Button
+                variant="outline"
+                onClick={() => {
+                  const [owner, repoName] = repo.full_name.split('/');
+                  navigate({
+                    to: '/dashboard/repo/$owner/$repoName',
+                    params: {owner, repoName},
+                  });
+                }}
+              >
                 <PlusIcon className="mr-2" />
                 Select
               </Button>
@@ -78,7 +89,7 @@ const Dashboard = () => {
   return (
     <>
       {Info}
-      <div className={clsx(styles.repos, 'mt-5')}>{Repos}</div>
+      <div className={clsx(styles.repos, 'my-5')}>{Repos}</div>
     </>
   );
 };

@@ -12,6 +12,7 @@ import {useUserStore} from '@ui/state/user';
 import {Avatar, AvatarImage} from '@ui/components/shared/ui/avatar';
 import {Separator} from '@ui/components/shared/ui/separator';
 import {ListBulletIcon} from '@radix-ui/react-icons';
+import {useEffect, useRef} from 'react';
 
 const DashboardLayout = () => {
   const navigate = useNavigate();
@@ -21,9 +22,25 @@ const DashboardLayout = () => {
     logout: state.logout,
   }));
 
+  const navigationRef = useRef<HTMLElement>();
+  const bodyRef = useRef<HTMLElement>();
+
+  useEffect(() => {
+    if (navigationRef.current && bodyRef.current) {
+      bodyRef.current.style.height = `${bodyRef.current.getBoundingClientRect().height - navigationRef.current.getBoundingClientRect().height / 2}px`;
+    }
+  }, []);
+
   return (
     <div className={styles.container}>
-      <nav className={styles.navContainer}>
+      <nav
+        className={styles.navContainer}
+        ref={(node) => {
+          if (node) {
+            navigationRef.current = node;
+          }
+        }}
+      >
         <div className={clsx('container', styles.nav)}>
           <img
             src="/dophermal-logo.png"
@@ -65,7 +82,14 @@ const DashboardLayout = () => {
           </Button>
         </div>
         <Separator orientation="vertical" />
-        <section className={styles.body}>
+        <section
+          className={styles.body}
+          ref={(node) => {
+            if (node) {
+              bodyRef.current = node;
+            }
+          }}
+        >
           <Outlet />
         </section>
       </div>
