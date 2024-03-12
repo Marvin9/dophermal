@@ -17,11 +17,18 @@ export const github = createQueryKeys('github', {
         .get(`/github/repos/${owner}/${name}`)
         .then((res) => res.data as GithubRepo),
   }),
-  pr: (owner: string, repo: string) => ({
+  prs: (owner: string, repo: string) => ({
     queryKey: [owner, repo],
     queryFn: () =>
       dophermalAxios
         .get(`/github/repos/${owner}/${repo}/pulls`)
         .then((res) => res.data as Array<GithubPullRequest>),
+  }),
+  pr: (owner: string, repo: string, pr: number) => ({
+    queryKey: [owner, repo, pr],
+    queryFn: () =>
+      dophermalAxios
+        .get(`/github/repos/${owner}/${repo}/pulls/${pr}`)
+        .then((res) => res.data as GithubPullRequest),
   }),
 });

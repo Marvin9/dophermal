@@ -1,8 +1,7 @@
 import {useQuery} from '@tanstack/react-query';
-import {createFileRoute} from '@tanstack/react-router';
+import {createFileRoute, useNavigate} from '@tanstack/react-router';
 import {queries} from '@ui/api/queries';
 
-import styles from './pull-requests.module.less';
 import {Spinner} from '@ui/components/shared/spinner';
 import {
   Card,
@@ -15,6 +14,7 @@ import {cn} from '@ui/lib/utils';
 import {CaretRightIcon} from '@radix-ui/react-icons';
 
 const Repo = () => {
+  const navigate = useNavigate();
   const {repoName, owner} = Route.useParams();
 
   const {data: repoData, isLoading: repoDataLoading} = useQuery({
@@ -23,7 +23,7 @@ const Repo = () => {
   });
 
   const {data: repoPr, isLoading: repoPrLoading} = useQuery({
-    ...queries.github.pr(owner, repoName),
+    ...queries.github.prs(owner, repoName),
     enabled: !!repoName,
     placeholderData: [],
   });
@@ -33,16 +33,23 @@ const Repo = () => {
   }
 
   return (
-    <div className={styles.container}>
+    <div>
       <h2 className="text-2xl font-semibold">{repoData?.full_name}</h2>
-      <div className={cn(styles.prContainer, 'mt-10')}>
+      <div className={cn('mt-10')}>
         {repoPr?.map((pr) => (
           <Card
             key={pr.id}
-            className={cn(
-              styles.prCard,
-              'my-5 hover:bg-accent relative cursor-pointer',
-            )}
+            className={cn('my-5 hover:bg-accent relative cursor-pointer')}
+            onClick={() =>
+              navigate({
+                to: '/dashboard/repo/$owner/$repoName/pulls/$pull',
+                params: {
+                  owner,
+                  repoName,
+                  pull: pr.number + '',
+                },
+              })
+            }
           >
             <CardHeader>
               <CardTitle>{pr.title}</CardTitle>
@@ -62,7 +69,7 @@ const Repo = () => {
 };
 
 export const Route = createFileRoute(
-  '/_protected/_dashboard-layout/dashboard/repo/$owner/$repoName',
+  '/_protected/_dashboard-layout/dashboard/repo/$owner/$repoName/',
 )({
   component: Repo,
 });

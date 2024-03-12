@@ -83,4 +83,35 @@ export class GithubController {
       return prDto;
     });
   }
+
+  @Get('repos/:owner/:name/pulls/:pull')
+  async getPullRequest(
+    @JWTExtractData() userData: JWTExtractDto,
+    @Param('owner') owner: string,
+    @Param('name') repo: string,
+    @Param('pull') pull: number,
+  ) {
+    const {data} = await request(
+      'GET /repos/{owner}/{repo}/pulls/{pull_number}',
+      {
+        headers: {
+          authorization: `token ${userData.githubAccessToken}`,
+        },
+        owner,
+        repo,
+        pull_number: pull,
+      },
+    );
+
+    const prDto = new GithubPullRequest();
+
+    prDto.id = data.id;
+    prDto.created_at = data.created_at;
+    prDto.html_url = data.html_url;
+    prDto.number = data.number;
+    prDto.title = data.title;
+    prDto.user = data.user;
+
+    return prDto;
+  }
 }

@@ -17,7 +17,8 @@ import { Route as AuthLoginImport } from './routes/auth/login'
 import { Route as AuthCallbackImport } from './routes/auth/callback'
 import { Route as ProtectedDashboardLayoutImport } from './routes/_protected/_dashboard-layout'
 import { Route as ProtectedDashboardLayoutDashboardIndexImport } from './routes/_protected/_dashboard-layout/dashboard/index'
-import { Route as ProtectedDashboardLayoutDashboardRepoOwnerRepoNameImport } from './routes/_protected/_dashboard-layout/dashboard/repo/$owner/$repoName'
+import { Route as ProtectedDashboardLayoutDashboardRepoOwnerRepoNameIndexImport } from './routes/_protected/_dashboard-layout/dashboard/repo_/$owner/$repoName/index'
+import { Route as ProtectedDashboardLayoutDashboardRepoOwnerRepoNamePullsPullImport } from './routes/_protected/_dashboard-layout/dashboard/repo_/$owner/$repoName/pulls/$pull'
 
 // Create/Update Routes
 
@@ -52,9 +53,15 @@ const ProtectedDashboardLayoutDashboardIndexRoute =
     getParentRoute: () => ProtectedDashboardLayoutRoute,
   } as any)
 
-const ProtectedDashboardLayoutDashboardRepoOwnerRepoNameRoute =
-  ProtectedDashboardLayoutDashboardRepoOwnerRepoNameImport.update({
-    path: '/dashboard/repo/$owner/$repoName',
+const ProtectedDashboardLayoutDashboardRepoOwnerRepoNameIndexRoute =
+  ProtectedDashboardLayoutDashboardRepoOwnerRepoNameIndexImport.update({
+    path: '/dashboard/repo/$owner/$repoName/',
+    getParentRoute: () => ProtectedDashboardLayoutRoute,
+  } as any)
+
+const ProtectedDashboardLayoutDashboardRepoOwnerRepoNamePullsPullRoute =
+  ProtectedDashboardLayoutDashboardRepoOwnerRepoNamePullsPullImport.update({
+    path: '/dashboard/repo/$owner/$repoName/pulls/$pull',
     getParentRoute: () => ProtectedDashboardLayoutRoute,
   } as any)
 
@@ -86,8 +93,12 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProtectedDashboardLayoutDashboardIndexImport
       parentRoute: typeof ProtectedDashboardLayoutImport
     }
-    '/_protected/_dashboard-layout/dashboard/repo/$owner/$repoName': {
-      preLoaderRoute: typeof ProtectedDashboardLayoutDashboardRepoOwnerRepoNameImport
+    '/_protected/_dashboard-layout/dashboard/repo/$owner/$repoName/': {
+      preLoaderRoute: typeof ProtectedDashboardLayoutDashboardRepoOwnerRepoNameIndexImport
+      parentRoute: typeof ProtectedDashboardLayoutImport
+    }
+    '/_protected/_dashboard-layout/dashboard/repo/$owner/$repoName/pulls/$pull': {
+      preLoaderRoute: typeof ProtectedDashboardLayoutDashboardRepoOwnerRepoNamePullsPullImport
       parentRoute: typeof ProtectedDashboardLayoutImport
     }
   }
@@ -100,7 +111,8 @@ export const routeTree = rootRoute.addChildren([
   ProtectedRoute.addChildren([
     ProtectedDashboardLayoutRoute.addChildren([
       ProtectedDashboardLayoutDashboardIndexRoute,
-      ProtectedDashboardLayoutDashboardRepoOwnerRepoNameRoute,
+      ProtectedDashboardLayoutDashboardRepoOwnerRepoNameIndexRoute,
+      ProtectedDashboardLayoutDashboardRepoOwnerRepoNamePullsPullRoute,
     ]),
   ]),
   AuthCallbackRoute,
