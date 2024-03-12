@@ -1,9 +1,21 @@
-import {HomeIcon, SunIcon} from '@radix-ui/react-icons';
-import {useQuery} from '@tanstack/react-query';
+import {HomeIcon, PlusCircledIcon, SunIcon} from '@radix-ui/react-icons';
+import {useMutation, useQuery} from '@tanstack/react-query';
 import {createFileRoute} from '@tanstack/react-router';
+import {dophermalAxios} from '@ui/api/base';
 import {queries} from '@ui/api/queries';
+import {CreateEphermalEnvironment} from '@ui/components/create-ephermal-environment';
 import {Spinner} from '@ui/components/shared/spinner';
+import {Button} from '@ui/components/shared/ui/button';
 import {Separator} from '@ui/components/shared/ui/separator';
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from '@ui/components/shared/ui/sheet';
+import {ContainerConfig, ContainerImage} from '@ui/dto';
+import {useDisclosure} from '@ui/lib/hooks';
 
 const PullRequestPage = () => {
   const {owner, repoName, pull} = Route.useParams();
@@ -12,6 +24,37 @@ const PullRequestPage = () => {
     ...queries.github.pr(owner, repoName, Number(pull)),
     enabled: !!owner && !!repoName && !!pull,
   });
+
+  useQuery({
+    ...queries.container.listByPullRequest(repoName, Number(pull)),
+    enabled: !!repoName && !!Number(pull),
+  });
+
+  const {open, onOpen, onClose, toggle} = useDisclosure();
+
+  const {mutate: createEphermalEnv, isPending: createEphermalEnvPending} =
+    useMutation({
+      mutationFn: async (
+        vars: Pick<
+          ContainerImage,
+          'pullImageUrl' | 'pullRequestNumber' | 'githubRepoName'
+        > &
+          Pick<ContainerConfig, 'port' | 'keyValueEnv'>,
+      ) => {
+        const {data} = await dophermalAxios.post('/container-config', {
+          port: vars.port,
+        });
+
+        const containerConfig = data as ContainerConfig;
+
+        return dophermalAxios.post('/container-image', {
+          pullImageUrl: vars.pullImageUrl,
+          pullRequestNumber: vars.pullRequestNumber,
+          githubRepoName: vars.githubRepoName,
+          containerConfigurationId: containerConfig.id,
+        });
+      },
+    });
 
   if (isLoading) {
     return <Spinner withWrapper />;
@@ -42,12 +85,49 @@ const PullRequestPage = () => {
         </div>
       </div>
 
-      <Separator className="my-10" />
+      <Separator className="my-5" />
 
-      <h2 className="text-lg font-semibold flex items-center gap-5">
-        <HomeIcon />
-        Ephermal Environments
-      </h2>
+      <div className="flex items-center">
+        <h2 className="text-lg font-semibold flex items-center gap-5">
+          <HomeIcon />
+          Ephermal Environments
+        </h2>
+        <Sheet open={open} onOpenChange={toggle}>
+          <SheetTrigger asChild onClick={onOpen}>
+            <Button className="ml-auto" disabled={createEphermalEnvPending}>
+              {createEphermalEnvPending ? (
+                <Spinner />
+              ) : (
+                <PlusCircledIcon className="mr-2" />
+              )}{' '}
+              Create New Ephermal
+            </Button>
+          </SheetTrigger>
+
+          <SheetContent>
+            <SheetHeader>
+              <SheetTitle>✨ Create New Ephermal</SheetTitle>
+            </SheetHeader>
+
+            <Separator className="my-5" />
+
+            <div className="mt-5">
+              <CreateEphermalEnvironment
+                onSubmit={(eph) => {
+                  onClose();
+                  createEphermalEnv({
+                    githubRepoName: repoName,
+                    pullRequestNumber: Number(pull),
+                    port: eph.port,
+                    pullImageUrl: eph.pullImageUrl,
+                    keyValueEnv: {},
+                  });
+                }}
+              />
+            </div>
+          </SheetContent>
+        </Sheet>
+      </div>
     </div>
   );
 };

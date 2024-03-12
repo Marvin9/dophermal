@@ -33,7 +33,7 @@ export class ContainerConfig {
   @Column()
   port: number;
 
-  @Column('json')
+  @Column('json', {nullable: true})
   keyValueEnv: Record<string, string>;
 
   @ManyToOne(() => RepoLevelContainerConfig, (config) => config.config)

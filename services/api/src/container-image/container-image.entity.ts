@@ -2,10 +2,12 @@ import {ContainerConfig} from 'src/container-config/container-config.entity';
 import {User} from 'src/user/user.entity';
 import {
   Column,
+  CreateDateColumn,
   Entity,
   JoinColumn,
   ManyToOne,
   PrimaryGeneratedColumn,
+  UpdateDateColumn,
 } from 'typeorm';
 
 export enum CONTAINER_IMAGE_STATUS {
@@ -49,4 +51,10 @@ export class ContainerImage {
     nullable: true,
   })
   port: number;
+
+  @CreateDateColumn()
+  createdAt: Date;
+
+  @UpdateDateColumn()
+  updatedAt: Date;
 }
