@@ -3,6 +3,7 @@ tools-version:
 	pnpm -v
 	sqlite3 --version
 	docker --version
+	go -v
 
 clean-local-db:
 	rm -rf ./db
@@ -16,4 +17,10 @@ build-api:
 build-controller:
 	cd services/controller && make build
 
-build: build-api build-controller
+build-ui:
+	cd services/ui && pnpm build
+
+build: build-ui build-api build-controller
+
+prod:
+	goreman -set-ports=false start
