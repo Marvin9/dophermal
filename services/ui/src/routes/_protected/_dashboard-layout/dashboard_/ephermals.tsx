@@ -31,8 +31,12 @@ const useManageContainerImages = () => {
   };
 
   useEffect(() => {
+    if (!selectedEphermalId) {
+      return;
+    }
+
     const watchPRContainerStatus = new EventSourcePolyfill(
-      `${config.DOPHERMAL_API}/container-image/watch`,
+      `${config.DOPHERMAL_API}/container-image/${selectedEphermalId}/watch`,
       {
         headers: {
           Authorization: `Bearer ${getBearer()}`,
@@ -62,7 +66,7 @@ const useManageContainerImages = () => {
     watchPRContainerStatus.addEventListener('message', handler);
 
     return () => watchPRContainerStatus.close();
-  }, []);
+  }, [selectedEphermalId]);
 
   return {
     containerImages,

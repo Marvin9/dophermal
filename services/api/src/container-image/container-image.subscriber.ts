@@ -26,9 +26,9 @@ export class ContainerImageStatusSubscriber
     return ContainerImage;
   }
 
-  afterUpdate(event: UpdateEvent<ContainerImage>): void | Promise<any> {
+  afterUpdate(event: UpdateEvent<ContainerImage>): void {
     this.logger.debug('UPDATED ENTITY STATUS');
-    this.logger.debug(event.entity);
+    this.logger.debug(event.databaseEntity);
 
     const payload = new PushPRContainersStatusUpdateEvent();
     payload.status = event.entity.status;
@@ -43,10 +43,17 @@ export class ContainerImageStatusSubscriber
     );
 
     this.eventEmitter.emit(
-      events['push.all-container-status-update'](
-        event.databaseEntity.createdBy,
-      ),
+      events['push.container-status-update'](event.entity.id),
       payload,
     );
+
+    if (event.entity.createdBy?.id) {
+      this.eventEmitter.emit(
+        events['push.all-container-status-update'](
+          event.databaseEntity.createdBy,
+        ),
+        payload,
+      );
+    }
   }
 }

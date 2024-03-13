@@ -22,6 +22,7 @@ import {Button} from './shared/ui/button';
 import {useToast} from './shared/ui/use-toast';
 import {StatusDot} from './shared/status-dot';
 import {useUserStore} from '@ui/state/user';
+import {Link} from '@tanstack/react-router';
 
 export type EphermalEnvironmentListProps = {
   ephermalEnv: ContainerImage[];
@@ -76,7 +77,7 @@ export const EphermalEnvironmentList = (
       selectedEphermalPayload?.status || CONTAINER_IMAGE_STATUS.UNKNOWN,
     ),
     enabled: !!selectedEphermalPayload?.id && shouldShowLogs,
-    placeholderData: '',
+    placeholderData: (oldData) => oldData || '',
   });
 
   if (!ephermalEnv?.length) {
@@ -128,7 +129,7 @@ export const EphermalEnvironmentList = (
       <Separator orientation="vertical" className="h-full" />
 
       {!!selectedEphermalPayload?.id && (
-        <div className="w-full">
+        <div className="w-full h-fit">
           <div className="flex items-center w-full">
             <div>
               <h3 className="text-xl font-light">
@@ -142,13 +143,21 @@ export const EphermalEnvironmentList = (
                   </h3>
                   <h3 className="text-xs mt-1">
                     <b>PR</b>:{' '}
-                    <a
+                    <Link
                       className="underline text-blue-600"
                       target="__blank"
-                      href={`https://github.com/${user.username}/${selectedEphermalPayload.githubRepoName}/pull/${selectedEphermalPayload.pullRequestNumber}`}
+                      to="/dashboard/repo/$owner/$repoName/pulls/$pull"
+                      params={{
+                        owner: user?.username || '',
+                        repoName: selectedEphermalPayload.githubRepoName,
+                        pull: selectedEphermalPayload.pullRequestNumber + '',
+                      }}
+                      search={{
+                        selectedEphermalId: selectedEphermalPayload.id,
+                      }}
                     >
                       {selectedEphermalPayload.pullRequestNumber}
-                    </a>
+                    </Link>
                   </h3>
                 </>
               )}
@@ -156,7 +165,7 @@ export const EphermalEnvironmentList = (
                 Last update{' '}
                 {dayjs(selectedEphermalPayload?.updatedAt).fromNow()}
               </h5>
-              <Badge className={'mt-5'}>
+              <Badge className={'mt-5'} variant="outline">
                 <StatusDot
                   status={selectedEphermalPayload?.status}
                   className="mr-1"

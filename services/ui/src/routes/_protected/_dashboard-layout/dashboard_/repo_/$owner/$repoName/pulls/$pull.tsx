@@ -128,16 +128,21 @@ const PullRequestPage = () => {
         toast({
           title: `New ephermal created successfully`,
         });
+
+        const updater = (old: ContainerImage[]) => {
+          if (Array.isArray(old)) {
+            return [data, ...old];
+          }
+
+          return [data];
+        };
+
         queryClient.setQueryData(
           queries.container.listByPullRequest(repoName, Number(pull)).queryKey,
-          (old: ContainerImage[]) => {
-            if (Array.isArray(old)) {
-              return [data, ...old];
-            }
-
-            return [data];
-          },
+          updater,
         );
+
+        queryClient.setQueryData(queries.container.list().queryKey, updater);
       },
     });
 

@@ -59,7 +59,10 @@ export class ContainerImageService {
   }
 
   listByUser(user: User) {
-    return this.containerImageRepository.find({where: {createdBy: user}});
+    return this.containerImageRepository.find({
+      where: {createdBy: user},
+      order: {createdAt: 'desc'},
+    });
   }
 
   listByRepo(user: User, repo: string) {
