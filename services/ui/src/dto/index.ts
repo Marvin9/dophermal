@@ -51,4 +51,6 @@ export type ContainerImage = {
   githubRepoName: string;
   createdBy: User;
   status: CONTAINER_IMAGE_STATUS;
+  createdAt: string;
+  updatedAt: string;
 };

@@ -10,4 +10,11 @@ export const container = createQueryKeys('container', {
         .get(`/container-image/repo/${repo}/pr/${pr}`)
         .then((res) => res.data as Array<ContainerImage>),
   }),
+  logsUrl: (containerImageId: string) => ({
+    queryKey: [containerImageId],
+    queryFn: () =>
+      dophermalAxios
+        .get(`/container-image/${containerImageId}/s3-logs`)
+        .then((res) => res.data as string),
+  }),
 });

@@ -1,13 +1,20 @@
+import dayjs from 'dayjs';
 import {StrictMode} from 'react';
 import ReactDOM from 'react-dom/client';
 import {RouterProvider, createRouter} from '@tanstack/react-router';
 
 import './index.css';
 
+import 'event-source-polyfill/src/eventsource.min.js';
+
 // Import the generated route tree
 import {routeTree} from './routeTree.gen';
 import {QueryClientProvider} from '@tanstack/react-query';
 import {queryClient} from './api/client';
+
+import relativeTime from 'dayjs/plugin/relativeTime';
+
+dayjs.extend(relativeTime);
 
 // Create a new router instance
 const router = createRouter({routeTree});

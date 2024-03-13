@@ -29,10 +29,11 @@ export class ContainerImageService {
   }
 
   updateImageStatus(id: string, status: CONTAINER_IMAGE_STATUS, port?: number) {
-    return this.containerImageRepository.update(id, {
-      status,
-      port,
-    });
+    const containerImage = new ContainerImage();
+    containerImage.id = id;
+    containerImage.status = status;
+    containerImage.port = port;
+    return this.containerImageRepository.save(containerImage);
   }
 
   batchUpdateImageStatus(id: string[], status: CONTAINER_IMAGE_STATUS) {
@@ -64,6 +65,9 @@ export class ContainerImageService {
   listByRepo(user: User, repo: string) {
     return this.containerImageRepository.find({
       where: {createdBy: user, githubRepoName: repo},
+      order: {
+        createdAt: 'desc',
+      },
     });
   }
 
@@ -97,6 +101,28 @@ export class ContainerImageService {
 
   getByPullRequest(user: User, repo: string, pr: number) {
     return this.containerImageRepository.find({
+      where: {
+        createdBy: user,
+        githubRepoName: repo,
+        pullRequestNumber: pr,
+      },
+      order: {
+        createdAt: 'desc',
+      },
+    });
+  }
+
+  ownershipCheck(user: User, imageId: string) {
+    return this.containerImageRepository.exists({
+      where: {
+        createdBy: user,
+        id: imageId,
+      },
+    });
+  }
+
+  pullRequestOwnershipCheck(user: User, repo: string, pr: number) {
+    return this.containerImageRepository.exists({
       where: {
         createdBy: user,
         githubRepoName: repo,

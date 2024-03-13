@@ -16,18 +16,18 @@ import {
 } from '@ui/components/shared/ui/sheet';
 import {ContainerConfig, ContainerImage} from '@ui/dto';
 import {useDisclosure} from '@ui/lib/hooks';
+import {EphermalEnvironmentList} from '@ui/components/ephermal-environment-list';
+import {queryClient} from '@ui/api/client';
+import {useToast} from '@ui/components/shared/ui/use-toast';
 
 const PullRequestPage = () => {
   const {owner, repoName, pull} = Route.useParams();
 
+  const {toast} = useToast();
+
   const {data: pullRequest, isLoading} = useQuery({
     ...queries.github.pr(owner, repoName, Number(pull)),
     enabled: !!owner && !!repoName && !!pull,
-  });
-
-  useQuery({
-    ...queries.container.listByPullRequest(repoName, Number(pull)),
-    enabled: !!repoName && !!Number(pull),
   });
 
   const {open, onOpen, onClose, toggle} = useDisclosure();
@@ -54,6 +54,21 @@ const PullRequestPage = () => {
           containerConfigurationId: containerConfig.id,
         });
       },
+      onSuccess: (data) => {
+        toast({
+          title: `New ephermal created successfully`,
+        });
+        queryClient.setQueryData(
+          queries.container.listByPullRequest(repoName, Number(pull)).queryKey,
+          (old: ContainerImage[]) => {
+            if (Array.isArray(old)) {
+              return [data, ...old];
+            }
+
+            return [data];
+          },
+        );
+      },
     });
 
   if (isLoading) {
@@ -61,7 +76,7 @@ const PullRequestPage = () => {
   }
 
   return (
-    <div>
+    <div className="h-full">
       <div className="flex items-center gap-5">
         <SunIcon />
         <div>
@@ -76,7 +91,7 @@ const PullRequestPage = () => {
           <p className="text-sm text-muted-foreground font-light">
             by{' '}
             <a
-              href={`https://github.com/${pullRequest?.user.login}`}
+              href={`https://github.com/${pullRequest?.user?.login}`}
               target="__blank"
             >
               {pullRequest?.user?.login}
@@ -128,6 +143,8 @@ const PullRequestPage = () => {
           </SheetContent>
         </Sheet>
       </div>
+
+      <EphermalEnvironmentList />
     </div>
   );
 };

@@ -10,6 +10,7 @@ import {
   ContainerConfig,
   RepoLevelContainerConfig,
 } from 'src/container-config/container-config.entity';
+import {ContainerImageStatusSubscriber} from './container-image.subscriber';
 
 @Module({
   imports: [
@@ -19,6 +20,11 @@ import {
     TypeOrmModule.forFeature([RepoLevelContainerConfig]),
   ],
   controllers: [ContainerImageController],
-  providers: [ContainerImageService, SqsService, ContainerConfigService],
+  providers: [
+    ContainerImageService,
+    SqsService,
+    ContainerConfigService,
+    ContainerImageStatusSubscriber,
+  ],
 })
 export class ContainerImageModule {}

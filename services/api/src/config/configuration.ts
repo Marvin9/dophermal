@@ -20,6 +20,9 @@ export default () => ({
   sqs: {
     controllerQueue: process.env.CONTROLLER_SQS_QUEUE_NAME,
     statusQueue: process.env.STATUS_SQS_QUEUE_NAME,
-    disable: process.env.DISABLE_SQS,
+    disable: false,
+  },
+  s3: {
+    bucketName: process.env.CONTAINER_LOGS_BUCKET_NAME,
   },
 });

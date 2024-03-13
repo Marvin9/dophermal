@@ -1,0 +1,55 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: Simple cloud formation for bucket creation and configuration
+
+Parameters:
+  # s3
+  BucketName:
+    Type: String
+    Default: dophermal-container-log-dumps
+  # sqs
+  DelaySeconds:
+    Type: Number
+    Default: 5
+  MaximumMessageSize:
+    Type: Number
+    Default: 51200 # 50KB
+  MessageRetentionPeriod:
+    Type: Number
+    Default: 86400 # 1 Day
+  ReceiveMessageWaitTimeSeconds:
+    Type: Number
+    Default: 20
+
+Resources:
+  # s3
+  MainBucket:
+    Type: "AWS::S3::Bucket"
+    Properties:
+      BucketName: !Ref BucketName
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+          - ServerSideEncryptionByDefault:
+              SSEAlgorithm: AES256
+  
+  # sqs
+  # used to command controller
+  # "services/controller" is listener
+  ControllerQueue:
+    Type: AWS::SQS::Queue
+    Properties:
+      QueueName: ControllerQueue
+      DelaySeconds: !Ref DelaySeconds
+      MaximumMessageSize: !Ref MaximumMessageSize
+      MessageRetentionPeriod: !Ref MessageRetentionPeriod
+      ReceiveMessageWaitTimeSeconds: !Ref ReceiveMessageWaitTimeSeconds
+
+  # notify container status and metadata
+  # "servies/api" is listener
+  StatusQueue:
+    Type: AWS::SQS::Queue
+    Properties:
+      QueueName: StatusQueue
+      DelaySeconds: !Ref DelaySeconds
+      MaximumMessageSize: !Ref MaximumMessageSize
+      MessageRetentionPeriod: !Ref MessageRetentionPeriod
+      ReceiveMessageWaitTimeSeconds: !Ref ReceiveMessageWaitTimeSeconds
