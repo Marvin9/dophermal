@@ -69,28 +69,28 @@ const DashboardLayout = () => {
 
       <div className={styles.layout}>
         <div className={styles.sidebar}>
-          <Button variant="outline">
-            <Link
-              key="repos"
-              to="/dashboard/repos"
-              activeProps={{className: styles.linkActive}}
-              className={styles.link}
-            >
-              <ListBulletIcon />
+          <Link
+            key="repos"
+            to="/dashboard/repos"
+            activeProps={{className: styles.linkActive}}
+            className={styles.link}
+          >
+            <Button variant="outline" className="w-full">
+              <ListBulletIcon className="mr-2" />
               Repositories
-            </Link>
-          </Button>
+            </Button>
+          </Link>
 
-          <Button variant="outline">
-            <Link
-              key="activeEphermals"
-              to="/dashboard/ephermals"
-              activeProps={{className: styles.linkActive}}
-              className={styles.link}
-            >
-              🐳 <span>Ephermals</span>
-            </Link>
-          </Button>
+          <Link
+            key="activeEphermals"
+            to="/dashboard/ephermals"
+            activeProps={{className: styles.linkActive}}
+            className={styles.link}
+          >
+            <Button variant="outline" className="w-full">
+              🐳 <span className="ml-2">Ephermals</span>
+            </Button>
+          </Link>
         </div>
         <Separator orientation="vertical" />
         <section

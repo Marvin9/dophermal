@@ -129,7 +129,7 @@ export const EphermalEnvironmentList = (
       <Separator orientation="vertical" className="h-full" />
 
       {!!selectedEphermalPayload?.id && (
-        <div className="w-full h-fit">
+        <div className="w-7/12 h-fit">
           <div className="flex items-center w-full">
             <div>
               <h3 className="text-xl font-light">
