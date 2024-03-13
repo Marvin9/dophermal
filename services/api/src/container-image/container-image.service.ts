@@ -28,8 +28,15 @@ export class ContainerImageService {
     return this.containerImageRepository.save(containerImage);
   }
 
-  updateImageStatus(id: string, status: CONTAINER_IMAGE_STATUS, port?: number) {
-    const containerImage = new ContainerImage();
+  async updateImageStatus(
+    id: string,
+    status: CONTAINER_IMAGE_STATUS,
+    port?: number,
+  ) {
+    const containerImage = await this.containerImageRepository.findOne({
+      where: {id},
+      relations: ['createdBy'],
+    });
     containerImage.id = id;
     containerImage.status = status;
     containerImage.port = port;
@@ -62,6 +69,7 @@ export class ContainerImageService {
     return this.containerImageRepository.find({
       where: {createdBy: user},
       order: {createdAt: 'desc'},
+      relations: ['containerConfig', 'createdBy'],
     });
   }
 
@@ -71,6 +79,7 @@ export class ContainerImageService {
       order: {
         createdAt: 'desc',
       },
+      relations: ['containerConfig', 'createdBy'],
     });
   }
 
@@ -80,6 +89,7 @@ export class ContainerImageService {
         createdBy: user,
         id: imageId,
       },
+      relations: ['containerConfig', 'createdBy'],
     });
   }
 
@@ -112,6 +122,7 @@ export class ContainerImageService {
       order: {
         createdAt: 'desc',
       },
+      relations: ['containerConfig', 'createdBy'],
     });
   }
 

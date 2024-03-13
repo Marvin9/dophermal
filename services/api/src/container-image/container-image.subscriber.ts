@@ -8,6 +8,7 @@ import {ContainerImage} from './container-image.entity';
 import {EventEmitter2} from '@nestjs/event-emitter';
 import {PushPRContainersStatusUpdateEvent, events} from './events';
 import {Logger} from '@nestjs/common';
+import {GithubService} from 'src/github/github.service';
 
 @EventSubscriber()
 export class ContainerImageStatusSubscriber
@@ -18,6 +19,7 @@ export class ContainerImageStatusSubscriber
   constructor(
     private eventEmitter: EventEmitter2,
     private dataSource: DataSource,
+    private githubService: GithubService,
   ) {
     dataSource.subscribers.push(this);
   }
@@ -26,9 +28,9 @@ export class ContainerImageStatusSubscriber
     return ContainerImage;
   }
 
-  afterUpdate(event: UpdateEvent<ContainerImage>): void {
+  async afterUpdate(event: UpdateEvent<ContainerImage>): Promise<void> {
     this.logger.debug('UPDATED ENTITY STATUS');
-    this.logger.debug(event.databaseEntity);
+    this.logger.debug(event.entity);
 
     const payload = new PushPRContainersStatusUpdateEvent();
     payload.status = event.entity.status;

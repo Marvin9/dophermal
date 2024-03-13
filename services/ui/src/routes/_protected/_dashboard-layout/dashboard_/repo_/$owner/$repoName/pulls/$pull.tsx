@@ -210,6 +210,16 @@ const PullRequestPage = () => {
 
             <div className="mt-5">
               <CreateEphermalEnvironment
+                repeat={
+                  ephermalEnv?.length
+                    ? {
+                        keyValueEnv:
+                          ephermalEnv[0]?.containerConfig?.keyValueEnv,
+                        port: ephermalEnv[0]?.containerConfig?.port,
+                        pullImageUrl: ephermalEnv[0]?.pullImageUrl,
+                      }
+                    : undefined
+                }
                 onSubmit={(eph) => {
                   onClose();
                   createEphermalEnv({

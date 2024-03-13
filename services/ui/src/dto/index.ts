@@ -53,4 +53,5 @@ export type ContainerImage = {
   status: CONTAINER_IMAGE_STATUS;
   createdAt: string;
   updatedAt: string;
+  containerConfig: ContainerConfig;
 };

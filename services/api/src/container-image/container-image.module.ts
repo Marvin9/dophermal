@@ -11,13 +11,18 @@ import {
   RepoLevelContainerConfig,
 } from 'src/container-config/container-config.entity';
 import {ContainerImageStatusSubscriber} from './container-image.subscriber';
+import {GithubModule} from 'src/github/github.module';
+import {GithubService} from 'src/github/github.service';
+import {HttpModule} from '@nestjs/axios';
 
 @Module({
   imports: [
+    HttpModule,
     TypeOrmModule.forFeature([ContainerImage]),
     ContainerConfigModule,
     TypeOrmModule.forFeature([ContainerConfig]),
     TypeOrmModule.forFeature([RepoLevelContainerConfig]),
+    GithubModule,
   ],
   controllers: [ContainerImageController],
   providers: [
@@ -25,6 +30,7 @@ import {ContainerImageStatusSubscriber} from './container-image.subscriber';
     SqsService,
     ContainerConfigService,
     ContainerImageStatusSubscriber,
+    GithubService,
   ],
 })
 export class ContainerImageModule {}

@@ -2,7 +2,7 @@ import {useForm} from 'react-hook-form';
 import {Label} from '@ui/components/shared/ui/label';
 import {Input} from '@ui/components/shared/ui/input';
 import {Button} from './shared/ui/button';
-import {PlusCircledIcon, TrashIcon} from '@radix-ui/react-icons';
+import {CopyIcon, PlusCircledIcon, TrashIcon} from '@radix-ui/react-icons';
 import {omit} from '@ui/lib/utils';
 import {useState} from 'react';
 
@@ -14,12 +14,14 @@ type EphermalEnvironmentForm = {
 
 type CreateEphermalEnvironmentProps = {
   onSubmit(_in: EphermalEnvironmentForm): void;
+  repeat?: EphermalEnvironmentForm;
 };
 
 export const CreateEphermalEnvironment = ({
   onSubmit,
+  repeat,
 }: CreateEphermalEnvironmentProps) => {
-  const {register, handleSubmit, watch, setValue} =
+  const {register, handleSubmit, watch, setValue, reset} =
     useForm<EphermalEnvironmentForm>({
       defaultValues: {
         keyValueEnv: {},
@@ -39,6 +41,18 @@ export const CreateEphermalEnvironment = ({
         submit();
       }}
     >
+      {repeat && (
+        <Button
+          size="sm"
+          variant="outline"
+          className="mb-5"
+          type="button"
+          onClick={() => reset(repeat)}
+        >
+          <CopyIcon className="mr-2" />
+          Repeat latest ephermal
+        </Button>
+      )}
       <div className="gap-3 flex flex-col">
         <Label htmlFor="pullImageUrl">🐳 Docker Image:</Label>
         <Input

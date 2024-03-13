@@ -13,7 +13,7 @@ import {
 } from './shared/ui/tooltip';
 import clsx from 'clsx';
 import {Badge} from './shared/ui/badge';
-import {TrashIcon, UpdateIcon} from '@radix-ui/react-icons';
+import {GitHubLogoIcon, TrashIcon, UpdateIcon} from '@radix-ui/react-icons';
 import {CONTAINER_IMAGE_STATUS, ContainerImage} from '@ui/dto';
 import {Separator} from './shared/ui/separator';
 import {dophermalAxios} from '@ui/api/base';
@@ -131,10 +131,19 @@ export const EphermalEnvironmentList = (
       {!!selectedEphermalPayload?.id && (
         <div className="w-7/12 h-fit">
           <div className="flex items-center w-full">
-            <div>
-              <h3 className="text-xl font-light">
-                🐳 &nbsp;&nbsp; {selectedEphermalPayload?.pullImageUrl}
-              </h3>
+            <div className="w-full">
+              <div className="flex items-center w-full">
+                <h3 className="text-xl font-light">
+                  🐳 &nbsp;&nbsp; {selectedEphermalPayload?.pullImageUrl}
+                </h3>
+                <a
+                  className="ml-auto"
+                  target="_blank"
+                  href={`http://github.com/${user?.username}/${selectedEphermalPayload.githubRepoName}/pull/${selectedEphermalPayload.pullRequestNumber}`}
+                >
+                  <GitHubLogoIcon className="ml-auto scale-150" />
+                </a>
+              </div>
               <h5 className="mt-2 text-sm">{selectedEphermalPayload?.id}</h5>
               {props.showParentLink && (
                 <>
