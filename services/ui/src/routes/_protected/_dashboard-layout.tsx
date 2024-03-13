@@ -46,7 +46,7 @@ const DashboardLayout = () => {
             src="/dophermal-logo.png"
             alt="dophermal logo"
             className={styles.navLogo}
-            onClick={() => navigate({to: '/dashboard'})}
+            onClick={() => navigate({to: '/dashboard/repos'})}
           />
 
           <div className={styles.navUserDetails}>
@@ -72,12 +72,23 @@ const DashboardLayout = () => {
           <Button variant="outline">
             <Link
               key="repos"
-              to="/dashboard"
+              to="/dashboard/repos"
               activeProps={{className: styles.linkActive}}
               className={styles.link}
             >
               <ListBulletIcon />
               Repositories
+            </Link>
+          </Button>
+
+          <Button variant="outline">
+            <Link
+              key="activeEphermals"
+              to="/dashboard/ephermals"
+              activeProps={{className: styles.linkActive}}
+              className={styles.link}
+            >
+              🐳 <span>Ephermals</span>
             </Link>
           </Button>
         </div>

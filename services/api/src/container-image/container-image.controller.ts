@@ -160,6 +160,19 @@ export class ContainerImageController {
     this.sqsSvc.sendContainerStopCommand(containerImageId);
   }
 
+  @Sse('/watch')
+  async watchAllContainerImageStatus(@JWTUser() userData: User) {
+    return fromEvent(
+      this.eventEmitter,
+      events['push.all-container-status-update'](userData),
+    ).pipe(
+      map((data: PushPRContainersStatusUpdateEvent) => {
+        this.logger.debug(`sending to connection ${JSON.stringify(data)}`);
+        return {data} as MessageEvent;
+      }),
+    );
+  }
+
   @Sse(':id/watch')
   async watchContainerImageStatus(
     @JWTUser() userData: User,

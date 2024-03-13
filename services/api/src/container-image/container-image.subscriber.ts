@@ -41,5 +41,12 @@ export class ContainerImageStatusSubscriber
       ),
       payload,
     );
+
+    this.eventEmitter.emit(
+      events['push.all-container-status-update'](
+        event.databaseEntity.createdBy,
+      ),
+      payload,
+    );
   }
 }

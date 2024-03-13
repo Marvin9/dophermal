@@ -32,6 +32,8 @@ export const useManageAuth = () => {
 
   return {
     authenticated,
-    isLoading: isLoading || (!isLoading && user !== null && !authenticated),
+    isLoading:
+      isLoading ||
+      (!isLoading && user !== null && user !== undefined && !authenticated),
   };
 };

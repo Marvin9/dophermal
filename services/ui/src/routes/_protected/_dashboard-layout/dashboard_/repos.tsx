@@ -3,7 +3,7 @@ import {createFileRoute, useNavigate} from '@tanstack/react-router';
 import {queries} from '@ui/api/queries';
 import {ReactNode, useMemo, useState} from 'react';
 
-import styles from './dashboard.module.less';
+import styles from './repos.module.less';
 import {Spinner} from '@ui/components/shared/spinner';
 import {
   Alert,
@@ -95,7 +95,7 @@ const Dashboard = () => {
 };
 
 export const Route = createFileRoute(
-  '/_protected/_dashboard-layout/dashboard/',
+  '/_protected/_dashboard-layout/dashboard/repos',
 )({
   component: Dashboard,
 });

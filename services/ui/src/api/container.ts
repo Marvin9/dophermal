@@ -3,6 +3,13 @@ import {dophermalAxios} from './base';
 import {CONTAINER_IMAGE_STATUS, ContainerImage} from '@ui/dto';
 
 export const container = createQueryKeys('container', {
+  list: () => ({
+    queryKey: ['all'],
+    queryFn: () =>
+      dophermalAxios
+        .get('/container-image')
+        .then((res) => res.data as Array<ContainerImage>),
+  }),
   listByPullRequest: (repo: string, pr: number) => ({
     queryKey: [repo, pr],
     queryFn: () =>

@@ -18,14 +18,21 @@ export const errorToString = (err: unknown) => {
 };
 
 export const omit = <T>(obj: T, keys: (keyof T)[]) => {
-  console.log(obj);
   const newObj = {...obj};
 
   for (const key of keys) {
     delete newObj[key as keyof T];
   }
 
-  console.log(newObj);
-
   return newObj;
+};
+
+export type PullPageSearch = {
+  selectedEphermalId?: string;
+};
+
+export const withRouteSearchValidation = {
+  selectedEphermalId: (search: Record<string, unknown>): PullPageSearch => ({
+    selectedEphermalId: search?.selectedEphermalId as string,
+  }),
 };

@@ -1,7 +1,6 @@
 import dayjs from 'dayjs';
 import {useMutation, useQuery} from '@tanstack/react-query';
 import {queries} from '@ui/api/queries';
-import {Route} from '@ui/routes/_protected/_dashboard-layout/dashboard/repo_/$owner/$repoName/pulls/$pull';
 import {Spinner} from './shared/spinner';
 import NoDataIcon from '@ui/assets/no-data.svg';
 import ContainerIcon from '@ui/assets/container.svg';
@@ -12,34 +11,32 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from './shared/ui/tooltip';
-import {useEffect} from 'react';
 import clsx from 'clsx';
 import {Badge} from './shared/ui/badge';
-import {DotFilledIcon, TrashIcon, UpdateIcon} from '@radix-ui/react-icons';
+import {TrashIcon, UpdateIcon} from '@radix-ui/react-icons';
 import {CONTAINER_IMAGE_STATUS, ContainerImage} from '@ui/dto';
-import config from '@ui/lib/config';
-import {getBearer} from '@ui/lib/auth';
-import {EventSourcePolyfill, MessageEvent} from 'event-source-polyfill';
-import {PushPRContainersStatusUpdateEvent} from '@ui/lib/events';
-import {queryClient} from '@ui/api/client';
 import {Separator} from './shared/ui/separator';
 import {dophermalAxios} from '@ui/api/base';
 import {Popover, PopoverContent, PopoverTrigger} from './shared/ui/popover';
 import {Button} from './shared/ui/button';
 import {useToast} from './shared/ui/use-toast';
-import {useNavigate} from '@tanstack/react-router';
+import {StatusDot} from './shared/status-dot';
+import {useUserStore} from '@ui/state/user';
 
-export const EphermalEnvironmentList = () => {
-  const navigate = useNavigate();
-  const {selectedEphermalId} = Route.useSearch();
-  const {repoName, pull} = Route.useParams();
+export type EphermalEnvironmentListProps = {
+  ephermalEnv: ContainerImage[];
+  selectedEphermalId: string;
+  onSelectEphermal(id: string): void;
+  showParentLink?: boolean;
+};
 
+export const EphermalEnvironmentList = (
+  props: EphermalEnvironmentListProps,
+) => {
+  const {user} = useUserStore();
   const {toast} = useToast();
 
-  const {data: ephermalEnv, isLoading: ephermalEnvLoading} = useQuery({
-    ...queries.container.listByPullRequest(repoName, Number(pull)),
-    enabled: !!repoName && !!Number(pull),
-  });
+  const ephermalEnv = props.ephermalEnv;
 
   const {mutate: deleteContainerImage, isPending: pendingDeleteContainerImage} =
     useMutation({
@@ -53,15 +50,7 @@ export const EphermalEnvironmentList = () => {
       },
     });
 
-  const selectedEphermal = selectedEphermalId;
-
-  const setSelectedEphermal = (id: string) => {
-    navigate({
-      search: {
-        selectedEphermalId: id,
-      },
-    });
-  };
+  const selectedEphermal = props.selectedEphermalId;
 
   const selectedEphermalPayload = ephermalEnv?.find(
     (env) => env?.id === selectedEphermal,
@@ -90,44 +79,6 @@ export const EphermalEnvironmentList = () => {
     placeholderData: '',
   });
 
-  useEffect(() => {
-    const watchPRContainerStatus = new EventSourcePolyfill(
-      `${config.DOPHERMAL_API}/container-image/repo/${repoName}/pr/${pull}/watch`,
-      {
-        headers: {
-          Authorization: `Bearer ${getBearer()}`,
-        },
-      },
-    );
-
-    const handler = (event: MessageEvent) => {
-      const data = JSON.parse(event.data) as PushPRContainersStatusUpdateEvent;
-
-      queryClient.setQueryData(
-        queries.container.listByPullRequest(repoName, Number(pull)).queryKey,
-        (currentData: ContainerImage[]) => {
-          const updatedData = [...currentData];
-
-          return updatedData.map((image) => {
-            return {
-              ...image,
-              status:
-                data.containerImageId === image.id ? data.status : image.status,
-            };
-          });
-        },
-      );
-    };
-
-    watchPRContainerStatus.addEventListener('message', handler);
-
-    return () => watchPRContainerStatus.close();
-  }, [repoName, pull]);
-
-  if (ephermalEnvLoading) {
-    return <Spinner withWrapper />;
-  }
-
   if (!ephermalEnv?.length) {
     return (
       <div className="flex w-full h-full items-center justify-center">
@@ -153,7 +104,7 @@ export const EphermalEnvironmentList = () => {
               },
               'cursor-pointer mb-5',
             )}
-            onClick={() => setSelectedEphermal(environment.id)}
+            onClick={() => props.onSelectEphermal(environment.id)}
           >
             <CardHeader>
               <CardTitle>Id: {environment.id}</CardTitle>
@@ -174,7 +125,8 @@ export const EphermalEnvironmentList = () => {
         ))}
       </div>
 
-      <Separator orientation="vertical" />
+      <Separator orientation="vertical" className="h-full" />
+
       {!!selectedEphermalPayload?.id && (
         <div className="w-full">
           <div className="flex items-center w-full">
@@ -182,30 +134,32 @@ export const EphermalEnvironmentList = () => {
               <h3 className="text-xl font-light">
                 🐳 &nbsp;&nbsp; {selectedEphermalPayload?.pullImageUrl}
               </h3>
-              <h5 className="mt-2">{selectedEphermalPayload?.id}</h5>
+              <h5 className="mt-2 text-sm">{selectedEphermalPayload?.id}</h5>
+              {props.showParentLink && (
+                <>
+                  <h3 className="text-xs mt-2">
+                    <b>Repo</b>: {selectedEphermalPayload.githubRepoName}
+                  </h3>
+                  <h3 className="text-xs mt-1">
+                    <b>PR</b>:{' '}
+                    <a
+                      className="underline text-blue-600"
+                      target="__blank"
+                      href={`https://github.com/${user.username}/${selectedEphermalPayload.githubRepoName}/pull/${selectedEphermalPayload.pullRequestNumber}`}
+                    >
+                      {selectedEphermalPayload.pullRequestNumber}
+                    </a>
+                  </h3>
+                </>
+              )}
               <h5 className="text-xs font-light mt-2">
                 Last update{' '}
                 {dayjs(selectedEphermalPayload?.updatedAt).fromNow()}
               </h5>
               <Badge className={'mt-5'}>
-                <DotFilledIcon
-                  className={clsx('scale-150 mr-1', {
-                    'text-green-600':
-                      selectedEphermalPayload.status ===
-                      CONTAINER_IMAGE_STATUS.RUNNING,
-                    'text-yellow-600':
-                      selectedEphermalPayload.status ===
-                        CONTAINER_IMAGE_STATUS.INITIATED ||
-                      selectedEphermalPayload.status ===
-                        CONTAINER_IMAGE_STATUS.IN_PROGRESS ||
-                      selectedEphermalPayload.status ===
-                        CONTAINER_IMAGE_STATUS.TERMINATING_IN_PROGRESS,
-                    'text-red-600':
-                      selectedEphermalPayload.status ===
-                        CONTAINER_IMAGE_STATUS.ERROR ||
-                      selectedEphermalPayload.status ===
-                        CONTAINER_IMAGE_STATUS.TERMINATED,
-                  })}
+                <StatusDot
+                  status={selectedEphermalPayload?.status}
+                  className="mr-1"
                 />
                 {selectedEphermalPayload.status?.toLowerCase()}
               </Badge>

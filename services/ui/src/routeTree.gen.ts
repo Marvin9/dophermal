@@ -16,9 +16,10 @@ import { Route as IndexImport } from './routes/index'
 import { Route as AuthLoginImport } from './routes/auth/login'
 import { Route as AuthCallbackImport } from './routes/auth/callback'
 import { Route as ProtectedDashboardLayoutImport } from './routes/_protected/_dashboard-layout'
-import { Route as ProtectedDashboardLayoutDashboardIndexImport } from './routes/_protected/_dashboard-layout/dashboard/index'
-import { Route as ProtectedDashboardLayoutDashboardRepoOwnerRepoNameIndexImport } from './routes/_protected/_dashboard-layout/dashboard/repo_/$owner/$repoName/index'
-import { Route as ProtectedDashboardLayoutDashboardRepoOwnerRepoNamePullsPullImport } from './routes/_protected/_dashboard-layout/dashboard/repo_/$owner/$repoName/pulls/$pull'
+import { Route as ProtectedDashboardLayoutDashboardReposImport } from './routes/_protected/_dashboard-layout/dashboard_/repos'
+import { Route as ProtectedDashboardLayoutDashboardEphermalsImport } from './routes/_protected/_dashboard-layout/dashboard_/ephermals'
+import { Route as ProtectedDashboardLayoutDashboardRepoOwnerRepoNameIndexImport } from './routes/_protected/_dashboard-layout/dashboard_/repo_/$owner/$repoName/index'
+import { Route as ProtectedDashboardLayoutDashboardRepoOwnerRepoNamePullsPullImport } from './routes/_protected/_dashboard-layout/dashboard_/repo_/$owner/$repoName/pulls/$pull'
 
 // Create/Update Routes
 
@@ -47,9 +48,15 @@ const ProtectedDashboardLayoutRoute = ProtectedDashboardLayoutImport.update({
   getParentRoute: () => ProtectedRoute,
 } as any)
 
-const ProtectedDashboardLayoutDashboardIndexRoute =
-  ProtectedDashboardLayoutDashboardIndexImport.update({
-    path: '/dashboard/',
+const ProtectedDashboardLayoutDashboardReposRoute =
+  ProtectedDashboardLayoutDashboardReposImport.update({
+    path: '/dashboard/repos',
+    getParentRoute: () => ProtectedDashboardLayoutRoute,
+  } as any)
+
+const ProtectedDashboardLayoutDashboardEphermalsRoute =
+  ProtectedDashboardLayoutDashboardEphermalsImport.update({
+    path: '/dashboard/ephermals',
     getParentRoute: () => ProtectedDashboardLayoutRoute,
   } as any)
 
@@ -89,8 +96,12 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthLoginImport
       parentRoute: typeof rootRoute
     }
-    '/_protected/_dashboard-layout/dashboard/': {
-      preLoaderRoute: typeof ProtectedDashboardLayoutDashboardIndexImport
+    '/_protected/_dashboard-layout/dashboard/ephermals': {
+      preLoaderRoute: typeof ProtectedDashboardLayoutDashboardEphermalsImport
+      parentRoute: typeof ProtectedDashboardLayoutImport
+    }
+    '/_protected/_dashboard-layout/dashboard/repos': {
+      preLoaderRoute: typeof ProtectedDashboardLayoutDashboardReposImport
       parentRoute: typeof ProtectedDashboardLayoutImport
     }
     '/_protected/_dashboard-layout/dashboard/repo/$owner/$repoName/': {
@@ -110,7 +121,8 @@ export const routeTree = rootRoute.addChildren([
   IndexRoute,
   ProtectedRoute.addChildren([
     ProtectedDashboardLayoutRoute.addChildren([
-      ProtectedDashboardLayoutDashboardIndexRoute,
+      ProtectedDashboardLayoutDashboardEphermalsRoute,
+      ProtectedDashboardLayoutDashboardReposRoute,
       ProtectedDashboardLayoutDashboardRepoOwnerRepoNameIndexRoute,
       ProtectedDashboardLayoutDashboardRepoOwnerRepoNamePullsPullRoute,
     ]),

@@ -40,7 +40,7 @@ const Login = () => {
   };
 
   if (authenticated) {
-    return <Navigate to="/dashboard" />;
+    return <Navigate to="/dashboard/repos" />;
   }
 
   return (

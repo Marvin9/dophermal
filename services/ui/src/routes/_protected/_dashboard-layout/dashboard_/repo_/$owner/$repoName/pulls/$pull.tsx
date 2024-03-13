@@ -1,6 +1,6 @@
 import {HomeIcon, PlusCircledIcon, SunIcon} from '@radix-ui/react-icons';
 import {useMutation, useQuery} from '@tanstack/react-query';
-import {createFileRoute} from '@tanstack/react-router';
+import {createFileRoute, useNavigate} from '@tanstack/react-router';
 import {dophermalAxios} from '@ui/api/base';
 import {queries} from '@ui/api/queries';
 import {CreateEphermalEnvironment} from '@ui/components/create-ephermal-environment';
@@ -19,6 +19,73 @@ import {useDisclosure} from '@ui/lib/hooks';
 import {EphermalEnvironmentList} from '@ui/components/ephermal-environment-list';
 import {queryClient} from '@ui/api/client';
 import {useToast} from '@ui/components/shared/ui/use-toast';
+import {useEffect} from 'react';
+import config from '@ui/lib/config';
+import {EventSourcePolyfill, MessageEvent} from 'event-source-polyfill';
+import {getBearer} from '@ui/lib/auth';
+import {PushPRContainersStatusUpdateEvent} from '@ui/lib/events';
+import {withRouteSearchValidation} from '@ui/lib/utils';
+
+const useManageContainerImages = () => {
+  const navigate = useNavigate();
+
+  const {selectedEphermalId} = Route.useSearch();
+  const {repoName, pull} = Route.useParams();
+
+  const {data: ephermalEnv, isLoading: ephermalEnvLoading} = useQuery({
+    ...queries.container.listByPullRequest(repoName, Number(pull)),
+    enabled: !!repoName && !!Number(pull),
+  });
+
+  const setSelectedEphermal = (id: string) => {
+    navigate({
+      search: {
+        selectedEphermalId: id,
+      },
+    });
+  };
+
+  useEffect(() => {
+    const watchPRContainerStatus = new EventSourcePolyfill(
+      `${config.DOPHERMAL_API}/container-image/repo/${repoName}/pr/${pull}/watch`,
+      {
+        headers: {
+          Authorization: `Bearer ${getBearer()}`,
+        },
+      },
+    );
+
+    const handler = (event: MessageEvent) => {
+      const data = JSON.parse(event.data) as PushPRContainersStatusUpdateEvent;
+
+      queryClient.setQueryData(
+        queries.container.listByPullRequest(repoName, Number(pull)).queryKey,
+        (currentData: ContainerImage[]) => {
+          const updatedData = [...currentData];
+
+          return updatedData.map((image) => {
+            return {
+              ...image,
+              status:
+                data.containerImageId === image.id ? data.status : image.status,
+            };
+          });
+        },
+      );
+    };
+
+    watchPRContainerStatus.addEventListener('message', handler);
+
+    return () => watchPRContainerStatus.close();
+  }, [repoName, pull]);
+
+  return {
+    ephermalEnv,
+    ephermalEnvLoading,
+    selectedEphermalId,
+    setSelectedEphermal,
+  };
+};
 
 const PullRequestPage = () => {
   const {owner, repoName, pull} = Route.useParams();
@@ -73,6 +140,13 @@ const PullRequestPage = () => {
         );
       },
     });
+
+  const {
+    ephermalEnv,
+    ephermalEnvLoading,
+    selectedEphermalId,
+    setSelectedEphermal,
+  } = useManageContainerImages();
 
   if (isLoading) {
     return <Spinner withWrapper />;
@@ -147,20 +221,21 @@ const PullRequestPage = () => {
         </Sheet>
       </div>
 
-      <EphermalEnvironmentList />
+      {ephermalEnvLoading && <Spinner withWrapper />}
+      {!ephermalEnvLoading && (
+        <EphermalEnvironmentList
+          ephermalEnv={ephermalEnv || []}
+          selectedEphermalId={selectedEphermalId || ''}
+          onSelectEphermal={setSelectedEphermal}
+        />
+      )}
     </div>
   );
-};
-
-export type PullPageSearch = {
-  selectedEphermalId?: string;
 };
 
 export const Route = createFileRoute(
   '/_protected/_dashboard-layout/dashboard/repo/$owner/$repoName/pulls/$pull',
 )({
   component: PullRequestPage,
-  validateSearch: (search: Record<string, unknown>): PullPageSearch => ({
-    selectedEphermalId: search?.selectedEphermalId as string,
-  }),
+  validateSearch: withRouteSearchValidation.selectedEphermalId,
 });
