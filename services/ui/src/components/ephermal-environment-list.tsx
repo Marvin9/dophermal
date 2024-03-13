@@ -12,7 +12,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from './shared/ui/tooltip';
-import {useEffect, useState} from 'react';
+import {useEffect} from 'react';
 import clsx from 'clsx';
 import {Badge} from './shared/ui/badge';
 import {DotFilledIcon, TrashIcon, UpdateIcon} from '@radix-ui/react-icons';
@@ -27,8 +27,11 @@ import {dophermalAxios} from '@ui/api/base';
 import {Popover, PopoverContent, PopoverTrigger} from './shared/ui/popover';
 import {Button} from './shared/ui/button';
 import {useToast} from './shared/ui/use-toast';
+import {useNavigate} from '@tanstack/react-router';
 
 export const EphermalEnvironmentList = () => {
+  const navigate = useNavigate();
+  const {selectedEphermalId} = Route.useSearch();
   const {repoName, pull} = Route.useParams();
 
   const {toast} = useToast();
@@ -50,7 +53,15 @@ export const EphermalEnvironmentList = () => {
       },
     });
 
-  const [selectedEphermal, setSelectedEphermal] = useState<string | null>();
+  const selectedEphermal = selectedEphermalId;
+
+  const setSelectedEphermal = (id: string) => {
+    navigate({
+      search: {
+        selectedEphermalId: id,
+      },
+    });
+  };
 
   const selectedEphermalPayload = ephermalEnv?.find(
     (env) => env?.id === selectedEphermal,

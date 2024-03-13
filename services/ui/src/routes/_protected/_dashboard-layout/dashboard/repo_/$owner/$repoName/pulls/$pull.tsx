@@ -152,8 +152,15 @@ const PullRequestPage = () => {
   );
 };
 
+export type PullPageSearch = {
+  selectedEphermalId?: string;
+};
+
 export const Route = createFileRoute(
   '/_protected/_dashboard-layout/dashboard/repo/$owner/$repoName/pulls/$pull',
 )({
   component: PullRequestPage,
+  validateSearch: (search: Record<string, unknown>): PullPageSearch => ({
+    selectedEphermalId: search?.selectedEphermalId as string,
+  }),
 });
