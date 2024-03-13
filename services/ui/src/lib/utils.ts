@@ -16,3 +16,16 @@ export const errorToString = (err: unknown) => {
 
   return JSON.stringify(err);
 };
+
+export const omit = <T>(obj: T, keys: (keyof T)[]) => {
+  console.log(obj);
+  const newObj = {...obj};
+
+  for (const key of keys) {
+    delete newObj[key as keyof T];
+  }
+
+  console.log(newObj);
+
+  return newObj;
+};

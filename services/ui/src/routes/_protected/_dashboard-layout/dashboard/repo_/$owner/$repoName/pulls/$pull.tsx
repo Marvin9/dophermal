@@ -43,16 +43,19 @@ const PullRequestPage = () => {
       ) => {
         const {data} = await dophermalAxios.post('/container-config', {
           port: vars.port,
+          keyValueEnv: vars.keyValueEnv,
         });
 
         const containerConfig = data as ContainerConfig;
 
-        return dophermalAxios.post('/container-image', {
-          pullImageUrl: vars.pullImageUrl,
-          pullRequestNumber: vars.pullRequestNumber,
-          githubRepoName: vars.githubRepoName,
-          containerConfigurationId: containerConfig.id,
-        });
+        return dophermalAxios
+          .post('/container-image', {
+            pullImageUrl: vars.pullImageUrl,
+            pullRequestNumber: vars.pullRequestNumber,
+            githubRepoName: vars.githubRepoName,
+            containerConfigurationId: containerConfig.id,
+          })
+          .then((res) => res.data);
       },
       onSuccess: (data) => {
         toast({
@@ -135,7 +138,7 @@ const PullRequestPage = () => {
                     pullRequestNumber: Number(pull),
                     port: eph.port,
                     pullImageUrl: eph.pullImageUrl,
-                    keyValueEnv: {},
+                    keyValueEnv: eph.keyValueEnv,
                   });
                 }}
               />

@@ -51,7 +51,8 @@ func (es *eventService) CreateContainerImage(ctx context.Context, dto dophermal.
 	_, err = es.containerClient.Run(
 		ctx, containerName, dto.PullImage,
 		container.CoreContainerConfig{
-			Port: hostPort,
+			Port:        hostPort,
+			KeyValueEnv: dto.ContainerConfig.KeyValueEnv,
 		},
 		dto.ContainerConfig)
 

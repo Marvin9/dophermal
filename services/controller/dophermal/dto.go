@@ -5,6 +5,19 @@ type ContainerConfigDto struct {
 	KeyValueEnv map[string]string `json:"keyValueEnv"`
 }
 
+func (dto ContainerConfigDto) GetRawEnv() []string {
+	env := []string{}
+
+	if dto.KeyValueEnv == nil {
+		return env
+	}
+
+	for key, value := range dto.KeyValueEnv {
+		env = append(env, key+"="+value)
+	}
+	return env
+}
+
 type ContainerImageDto struct {
 	Id              string             `json:"id"`
 	PullImage       string             `json:"pullImage"`

@@ -1,6 +1,6 @@
 import {createQueryKeys} from '@lukemorales/query-key-factory';
 import {dophermalAxios} from './base';
-import {ContainerImage} from '@ui/dto';
+import {CONTAINER_IMAGE_STATUS, ContainerImage} from '@ui/dto';
 
 export const container = createQueryKeys('container', {
   listByPullRequest: (repo: string, pr: number) => ({
@@ -10,8 +10,11 @@ export const container = createQueryKeys('container', {
         .get(`/container-image/repo/${repo}/pr/${pr}`)
         .then((res) => res.data as Array<ContainerImage>),
   }),
-  logsUrl: (containerImageId: string) => ({
-    queryKey: [containerImageId],
+  logs: (
+    containerImageId: string,
+    containerStatus: CONTAINER_IMAGE_STATUS,
+  ) => ({
+    queryKey: [containerImageId, containerStatus],
     queryFn: () =>
       dophermalAxios
         .get(`/container-image/${containerImageId}/s3-logs`)

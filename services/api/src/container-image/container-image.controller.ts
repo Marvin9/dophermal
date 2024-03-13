@@ -229,14 +229,17 @@ export class ContainerImageController {
       throw new HttpException('Unauthorized', HttpStatus.UNAUTHORIZED);
     }
 
-    const getCommand = await this.s3Client.send(
-      new GetObjectCommand({
-        Bucket: this.configService.get('s3.bucketName'),
-        Key: `logs/${containerImageId}`,
-      }),
-    );
+    let logs = '';
+    try {
+      const getCommand = await this.s3Client.send(
+        new GetObjectCommand({
+          Bucket: this.configService.get('s3.bucketName'),
+          Key: `logs/${containerImageId}`,
+        }),
+      );
 
-    const logs = await getCommand.Body.transformToString();
+      logs = await getCommand.Body.transformToString();
+    } catch (e) {}
 
     return logs;
   }

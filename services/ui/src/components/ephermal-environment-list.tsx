@@ -3,6 +3,7 @@ import {useMutation, useQuery} from '@tanstack/react-query';
 import {queries} from '@ui/api/queries';
 import {Route} from '@ui/routes/_protected/_dashboard-layout/dashboard/repo_/$owner/$repoName/pulls/$pull';
 import {Spinner} from './shared/spinner';
+import NoDataIcon from '@ui/assets/no-data.svg';
 import ContainerIcon from '@ui/assets/container.svg';
 import {Card, CardDescription, CardHeader, CardTitle} from './shared/ui/card';
 import {
@@ -58,7 +59,7 @@ export const EphermalEnvironmentList = () => {
   let shouldShowLogs = true;
 
   switch (selectedEphermalPayload?.status) {
-    case CONTAINER_IMAGE_STATUS.RUNNING:
+    case CONTAINER_IMAGE_STATUS.IN_PROGRESS:
     case CONTAINER_IMAGE_STATUS.INITIATED:
       shouldShowLogs = false;
   }
@@ -70,7 +71,10 @@ export const EphermalEnvironmentList = () => {
     refetch: refreshLogs,
     isRefetching: refetchingLogs,
   } = useQuery({
-    ...queries.container.logsUrl(selectedEphermalPayload?.id || ''),
+    ...queries.container.logs(
+      selectedEphermalPayload?.id || '',
+      selectedEphermalPayload?.status || CONTAINER_IMAGE_STATUS.UNKNOWN,
+    ),
     enabled: !!selectedEphermalPayload?.id && shouldShowLogs,
     placeholderData: '',
   });
@@ -165,8 +169,13 @@ export const EphermalEnvironmentList = () => {
           <div className="flex items-center w-full">
             <div>
               <h3 className="text-xl font-light">
-                🐳 &nbsp;&nbsp;{selectedEphermalPayload?.id}
+                🐳 &nbsp;&nbsp; {selectedEphermalPayload?.pullImageUrl}
               </h3>
+              <h5 className="mt-2">{selectedEphermalPayload?.id}</h5>
+              <h5 className="text-xs font-light mt-2">
+                Last update{' '}
+                {dayjs(selectedEphermalPayload?.updatedAt).fromNow()}
+              </h5>
               <Badge className={'mt-5'}>
                 <DotFilledIcon
                   className={clsx('scale-150 mr-1', {
@@ -220,15 +229,25 @@ export const EphermalEnvironmentList = () => {
             )}
           </div>
 
-          <Button
-            size="sm"
-            className="mt-2"
-            onClick={() => refreshLogs()}
-            disabled={refetchingLogs}
-          >
-            {refetchingLogs ? <Spinner /> : <UpdateIcon className="mr-2" />}
-            Refresh Logs
-          </Button>
+          <div className="flex w-full">
+            <Button
+              size="sm"
+              className="mt-2 ml-auto"
+              onClick={() => refreshLogs()}
+              disabled={refetchingLogs && !shouldShowLogs}
+            >
+              {refetchingLogs ? <Spinner /> : <UpdateIcon className="mr-2" />}
+              Refresh Logs
+            </Button>
+          </div>
+          {!selectedEphermalLogs && !isSelectedEphermalLogsLoading && (
+            <div className="flex w-full mt-20 items-center justify-center text-center">
+              <div>
+                <img src={NoDataIcon} alt="no data" className="w-32" />
+                <span className="text-xs font-light">No logs found...</span>
+              </div>
+            </div>
+          )}
           {!isSelectedEphermalLogsLoading &&
             !ephermalLogsError &&
             !!selectedEphermalLogs && (
