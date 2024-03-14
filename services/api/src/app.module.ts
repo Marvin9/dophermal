@@ -19,6 +19,7 @@ import {JwtAuthGuard} from './auth/jwt-auth.guard';
 import {ContainerImageModule} from './container-image/container-image.module';
 import {ContainerConfigModule} from './container-config/container-config.module';
 import {SqsModule} from './sqs/sqs.module';
+import {AwsModule} from './aws/aws.module';
 
 @Module({
   imports: [
@@ -63,6 +64,7 @@ import {SqsModule} from './sqs/sqs.module';
     ContainerConfigModule,
     SqsModule,
     EventEmitterModule.forRoot(),
+    AwsModule,
   ],
   controllers: [AppController],
   providers: [

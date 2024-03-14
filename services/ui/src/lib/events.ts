@@ -14,4 +14,5 @@ export interface PushContainerStatusUpdateEvent {
 export interface PushPRContainersStatusUpdateEvent {
   containerImageId: string;
   status: CONTAINER_IMAGE_STATUS;
+  port: number;
 }

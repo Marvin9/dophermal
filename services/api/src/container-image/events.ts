@@ -17,4 +17,5 @@ export class PushContainerStatusUpdateEvent {
 export class PushPRContainersStatusUpdateEvent {
   containerImageId: string;
   status: CONTAINER_IMAGE_STATUS;
+  port: number;
 }

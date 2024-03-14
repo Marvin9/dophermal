@@ -13,10 +13,12 @@ import {Logger} from '@nestjs/common';
 import {ConfigService} from '@nestjs/config';
 import {EventEmitter2, OnEvent} from '@nestjs/event-emitter';
 import {PollContainerStatusUpdateEvent, StatusQueueDto, events} from './events';
+import {AwsService} from 'src/aws/aws.service';
+import {AwsModule} from 'src/aws/aws.module';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([ContainerImage])],
-  providers: [SqsService, ContainerImageService],
+  imports: [TypeOrmModule.forFeature([ContainerImage]), AwsModule],
+  providers: [SqsService, ContainerImageService, AwsService],
 })
 export class SqsModule {
   private readonly logger = new Logger(SqsService.name);
@@ -26,6 +28,7 @@ export class SqsModule {
     private readonly configService: ConfigService,
     private readonly eventEmitter: EventEmitter2,
     private readonly containerImageSvc: ContainerImageService,
+    private readonly awsService: AwsService,
   ) {
     if (configService.get('sqs.disable')) {
       this.logger.log('sqs is disabled');

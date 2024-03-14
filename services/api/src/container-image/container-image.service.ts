@@ -37,7 +37,6 @@ export class ContainerImageService {
       where: {id},
       relations: ['createdBy'],
     });
-    containerImage.id = id;
     containerImage.status = status;
     containerImage.port = port;
     return this.containerImageRepository.save(containerImage);

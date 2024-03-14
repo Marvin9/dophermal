@@ -54,4 +54,5 @@ export type ContainerImage = {
   createdAt: string;
   updatedAt: string;
   containerConfig: ContainerConfig;
+  port: number;
 };

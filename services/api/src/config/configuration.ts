@@ -25,4 +25,7 @@ export default () => ({
   s3: {
     bucketName: process.env.CONTAINER_LOGS_BUCKET_NAME,
   },
+  ec2: {
+    dockerHostInstanceName: process.env.DOCKER_HOST_EC2_INSTANCE_NAME,
+  },
 });

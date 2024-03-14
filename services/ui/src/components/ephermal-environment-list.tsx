@@ -13,7 +13,12 @@ import {
 } from './shared/ui/tooltip';
 import clsx from 'clsx';
 import {Badge} from './shared/ui/badge';
-import {GitHubLogoIcon, TrashIcon, UpdateIcon} from '@radix-ui/react-icons';
+import {
+  GitHubLogoIcon,
+  OpenInNewWindowIcon,
+  TrashIcon,
+  UpdateIcon,
+} from '@radix-ui/react-icons';
 import {CONTAINER_IMAGE_STATUS, ContainerImage} from '@ui/dto';
 import {Separator} from './shared/ui/separator';
 import {dophermalAxios} from '@ui/api/base';
@@ -23,6 +28,7 @@ import {useToast} from './shared/ui/use-toast';
 import {StatusDot} from './shared/status-dot';
 import {useUserStore} from '@ui/state/user';
 import {Link} from '@tanstack/react-router';
+import {useMemo} from 'react';
 
 export type EphermalEnvironmentListProps = {
   ephermalEnv: ContainerImage[];
@@ -77,8 +83,29 @@ export const EphermalEnvironmentList = (
       selectedEphermalPayload?.status || CONTAINER_IMAGE_STATUS.UNKNOWN,
     ),
     enabled: !!selectedEphermalPayload?.id && shouldShowLogs,
-    placeholderData: (oldData) => oldData || '',
+    placeholderData: (prevData) => prevData || '',
   });
+
+  const {data: dockerHostDns} = useQuery({
+    ...queries.container.hostDns(),
+    enabled: !!selectedEphermalPayload?.id,
+  });
+
+  const ephermalUrl = useMemo(() => {
+    if (selectedEphermalPayload?.status !== CONTAINER_IMAGE_STATUS.RUNNING) {
+      return '';
+    }
+
+    if (dockerHostDns && selectedEphermalPayload) {
+      const hostDns = new URL(`http://${dockerHostDns}`);
+
+      hostDns.port = `${selectedEphermalPayload?.port}`;
+
+      return hostDns.toString();
+    }
+
+    return '';
+  }, [dockerHostDns, selectedEphermalPayload]);
 
   if (!ephermalEnv?.length) {
     return (
@@ -133,8 +160,13 @@ export const EphermalEnvironmentList = (
           <div className="flex items-center w-full">
             <div className="w-full">
               <div className="flex items-center w-full">
-                <h3 className="text-xl font-light">
-                  🐳 &nbsp;&nbsp; {selectedEphermalPayload?.pullImageUrl}
+                <h3 className="text-xl font-light flex items-center gap-4">
+                  🐳 &nbsp;&nbsp; {selectedEphermalPayload?.pullImageUrl}{' '}
+                  {!!ephermalUrl && (
+                    <a href={ephermalUrl} target="_blank">
+                      <OpenInNewWindowIcon className="text-blue-600 hover:text-blue-400 scale-150 cursor-pointer" />
+                    </a>
+                  )}
                 </h3>
                 <a
                   className="ml-auto"

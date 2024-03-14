@@ -57,6 +57,7 @@ const useManageContainerImages = () => {
               ...image,
               status:
                 data.containerImageId === image.id ? data.status : image.status,
+              port: data.port,
             };
           });
         },

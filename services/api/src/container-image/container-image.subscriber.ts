@@ -35,6 +35,7 @@ export class ContainerImageStatusSubscriber
     const payload = new PushPRContainersStatusUpdateEvent();
     payload.status = event.entity.status;
     payload.containerImageId = event.entity.id;
+    payload.port = event.entity.port;
 
     this.eventEmitter.emit(
       events['push.pr-container-status-update'](

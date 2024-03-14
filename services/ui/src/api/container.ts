@@ -27,4 +27,11 @@ export const container = createQueryKeys('container', {
         .get(`/container-image/${containerImageId}/s3-logs`)
         .then((res) => res.data as string),
   }),
+  hostDns: () => ({
+    queryKey: ['docker'],
+    queryFn: () =>
+      dophermalAxios
+        .get('/container-image/metadata/dns')
+        .then((res) => res.data as string),
+  }),
 });

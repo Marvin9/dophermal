@@ -68,6 +68,7 @@ const useManageContainerImages = () => {
               ...image,
               status:
                 data.containerImageId === image.id ? data.status : image.status,
+              port: data.port,
             };
           });
         },
@@ -143,6 +144,8 @@ const PullRequestPage = () => {
         );
 
         queryClient.setQueryData(queries.container.list().queryKey, updater);
+
+        setSelectedEphermal(data?.id);
       },
     });
 

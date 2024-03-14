@@ -27,6 +27,10 @@ Parameters:
     Type: String
     Default: dophermal
     Description: enter PEM key-value pair to attach
+  InstanceName:
+    Type: String
+    Default: dophermal-docker-host
+    Description: instance name, this is used in API to get public DNS
 
 Resources:
   # s3
@@ -81,7 +85,7 @@ Resources:
         - !Ref 'EC2SecurityGroup'
       Tags:
         - Key: Name
-          Value: dophermal-host
+          Value: !Ref InstanceName
   # TODO: update security group
   EC2SecurityGroup:
     Type: AWS::EC2::SecurityGroup

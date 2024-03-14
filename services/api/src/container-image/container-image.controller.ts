@@ -10,7 +10,6 @@ import {
   Post,
   Sse,
 } from '@nestjs/common';
-import {GetObjectCommand, S3Client} from '@aws-sdk/client-s3';
 import {ContainerImageService} from './container-image.service';
 import {JWTUser} from 'src/auth/jwt.decorator';
 import {ContainerImageDto} from './container-image.dto';
@@ -25,28 +24,18 @@ import {
   PushPRContainersStatusUpdateEvent,
   events,
 } from './events';
-import {ConfigService} from '@nestjs/config';
+import {AwsService} from 'src/aws/aws.service';
 
 @Controller('container-image')
 export class ContainerImageController {
-  private s3Client: S3Client;
   private logger = new Logger(ContainerImageController.name);
   constructor(
     private containerImageService: ContainerImageService,
     private containerConfigService: ContainerConfigService,
     private readonly sqsSvc: SqsService,
     private eventEmitter: EventEmitter2,
-    private configService: ConfigService,
-  ) {
-    this.s3Client = new S3Client({
-      region: configService.get('aws.region'),
-      credentials: {
-        accessKeyId: configService.get('aws.accessKeyId'),
-        secretAccessKey: configService.get('aws.accessKeySecret'),
-        sessionToken: configService.get('aws.sessionToken'),
-      },
-    });
-  }
+    private awsService: AwsService,
+  ) {}
 
   @Get()
   async list(@JWTUser() user: User) {
@@ -229,10 +218,7 @@ export class ContainerImageController {
   }
 
   @Get(':id/s3-logs')
-  async getLogsUrl(
-    @JWTUser() user: User,
-    @Param('id') containerImageId: string,
-  ) {
+  async getLogs(@JWTUser() user: User, @Param('id') containerImageId: string) {
     const ownershipCheck = await this.containerImageService.ownershipCheck(
       user,
       containerImageId,
@@ -242,18 +228,13 @@ export class ContainerImageController {
       throw new HttpException('Unauthorized', HttpStatus.UNAUTHORIZED);
     }
 
-    let logs = '';
-    try {
-      const getCommand = await this.s3Client.send(
-        new GetObjectCommand({
-          Bucket: this.configService.get('s3.bucketName'),
-          Key: `logs/${containerImageId}`,
-        }),
-      );
+    return this.awsService.getContainerLogs(containerImageId);
+  }
 
-      logs = await getCommand.Body.transformToString();
-    } catch (e) {}
-
-    return logs;
+  @Get('/metadata/dns')
+  async getPublicDns() {
+    const dns = await this.awsService.getEC2InstancePublicDNS();
+    this.logger.log(dns);
+    return dns;
   }
 }
