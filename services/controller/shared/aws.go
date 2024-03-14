@@ -4,6 +4,11 @@ import (
 	"fmt"
 	"os"
 	"strconv"
+
+	"github.com/aws/aws-sdk-go/aws"
+	"github.com/aws/aws-sdk-go/aws/credentials"
+	"github.com/aws/aws-sdk-go/aws/session"
+	"github.com/aws/aws-sdk-go/service/ec2"
 )
 
 type AWSStaticCredentials struct {
@@ -58,4 +63,38 @@ func GetContainerLogsBucketName() string {
 	}
 
 	return bucket
+}
+
+func GetDockerHostPublicDns() (*string, error) {
+	awsConf := GetAWSConf()
+
+	awsCreds := awsConf.Creds
+
+	sess, err := session.NewSession(&aws.Config{
+		Credentials: credentials.NewStaticCredentials(awsCreds.AccessKeyID, awsCreds.AccessKeySecret, awsCreds.SessionToken),
+		Region:      &awsConf.Region,
+	})
+
+	if err != nil {
+		return aws.String(""), err
+	}
+
+	ec2Svc := ec2.New(sess)
+
+	instances, err := ec2Svc.DescribeInstances(&ec2.DescribeInstancesInput{
+		Filters: []*ec2.Filter{
+			{
+				Name: aws.String("tag:Name"),
+				Values: aws.StringSlice([]string{
+					os.Getenv("DOCKER_HOST_INSTANCE_NAME"),
+				}),
+			},
+		},
+	})
+
+	if err != nil {
+		return aws.String(""), err
+	}
+
+	return instances.Reservations[0].Instances[0].PublicDnsName, nil
 }

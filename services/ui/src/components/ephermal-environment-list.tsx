@@ -29,6 +29,7 @@ import {StatusDot} from './shared/status-dot';
 import {useUserStore} from '@ui/state/user';
 import {Link} from '@tanstack/react-router';
 import {useMemo} from 'react';
+import {queryClient} from '@ui/api/client';
 
 export type EphermalEnvironmentListProps = {
   ephermalEnv: ContainerImage[];
@@ -83,7 +84,8 @@ export const EphermalEnvironmentList = (
       selectedEphermalPayload?.status || CONTAINER_IMAGE_STATUS.UNKNOWN,
     ),
     enabled: !!selectedEphermalPayload?.id && shouldShowLogs,
-    placeholderData: (prevData) => prevData || '',
+    placeholderData: (_, state) =>
+      state?.queryKey ? queryClient.getQueryData(state?.queryKey) || '' : '',
   });
 
   const {data: dockerHostDns} = useQuery({

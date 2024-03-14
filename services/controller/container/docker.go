@@ -2,10 +2,14 @@ package container
 
 import (
 	"context"
+	"errors"
+	"fmt"
 	"io"
+	"os"
 	"strconv"
 
 	"github.com/Marvin9/dophermal/services/controller/dophermal"
+	"github.com/Marvin9/dophermal/services/controller/shared"
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/container"
 	dockercontainer "github.com/docker/docker/api/types/container"
@@ -20,7 +24,20 @@ type dockerClient struct {
 }
 
 func NewDockerContainerClient(logger *zap.Logger) (ContainerClientInterface, error) {
-	dockerApiClient, err := client.NewClientWithOpts(client.FromEnv)
+	dockerHostPublicDns, err := shared.GetDockerHostPublicDns()
+
+	if err != nil || dockerHostPublicDns == nil {
+		if dockerHostPublicDns == nil {
+			err = errors.New("empty docker host public dns")
+		}
+		return nil, err
+	}
+
+	dockerHostPublicDnsWithProtocol := fmt.Sprintf("%s://%s:%s", os.Getenv("DOCKER_HOST_INSTANCE_PROTOCOL"), *dockerHostPublicDns, os.Getenv("DOCKER_HOST_INSTANCE_PORT"))
+
+	logger.Debug("docker host public dns", zap.String("dns", dockerHostPublicDnsWithProtocol))
+
+	dockerApiClient, err := client.NewClientWithOpts(client.FromEnv, client.WithHost(dockerHostPublicDnsWithProtocol))
 
 	if err != nil {
 		return nil, err
