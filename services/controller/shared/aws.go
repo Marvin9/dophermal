@@ -96,5 +96,13 @@ func GetDockerHostPublicDns() (*string, error) {
 		return aws.String(""), err
 	}
 
-	return instances.Reservations[0].Instances[0].PublicDnsName, nil
+	if instances != nil &&
+		instances.Reservations != nil &&
+		len(instances.Reservations) > 0 &&
+		instances.Reservations[0].Instances != nil &&
+		len(instances.Reservations[0].Instances) > 0 {
+		return instances.Reservations[0].Instances[0].PublicDnsName, nil
+	}
+
+	return aws.String(""), nil
 }

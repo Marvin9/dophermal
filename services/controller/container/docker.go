@@ -2,7 +2,6 @@ package container
 
 import (
 	"context"
-	"errors"
 	"fmt"
 	"io"
 	"os"
@@ -26,24 +25,37 @@ type dockerClient struct {
 func NewDockerContainerClient(logger *zap.Logger) (ContainerClientInterface, error) {
 	dockerHostPublicDns, err := shared.GetDockerHostPublicDns()
 
-	if err != nil || dockerHostPublicDns == nil {
-		if dockerHostPublicDns == nil {
-			err = errors.New("empty docker host public dns")
-		}
-		return nil, err
+	opts := []client.Opt{
+		client.FromEnv,
 	}
 
-	dockerHostPublicDnsWithProtocol := fmt.Sprintf("%s://%s:%s", os.Getenv("DOCKER_HOST_INSTANCE_PROTOCOL"), *dockerHostPublicDns, os.Getenv("DOCKER_HOST_INSTANCE_PORT"))
+	if err != nil || dockerHostPublicDns == nil || *dockerHostPublicDns == "" {
+		if dockerHostPublicDns == nil {
+			logger.Info("not ec2 instance for docker host found")
+		} else {
+			logger.Error("ec2 instance for docker host error", zap.Error(err))
+		}
+	} else {
+		dockerHostPublicDnsWithProtocol := fmt.Sprintf("%s://%s:%s", os.Getenv("DOCKER_HOST_INSTANCE_PROTOCOL"), *dockerHostPublicDns, os.Getenv("DOCKER_HOST_INSTANCE_PORT"))
 
-	logger.Debug("docker host public dns", zap.String("dns", dockerHostPublicDnsWithProtocol))
+		logger.Debug("docker host public dns", zap.String("dns", dockerHostPublicDnsWithProtocol))
 
-	dockerApiClient, err := client.NewClientWithOpts(client.FromEnv, client.WithHost(dockerHostPublicDnsWithProtocol))
+		opts = append(opts, client.WithHost(dockerHostPublicDnsWithProtocol))
+	}
+
+	dockerApiClient, err := client.NewClientWithOpts(opts...)
 
 	if err != nil {
 		return nil, err
 	}
 
-	logger.Debug("docker client connected successfully.")
+	ping, err := dockerApiClient.Ping(context.Background())
+
+	if err != nil {
+		return nil, err
+	}
+
+	logger.Info("docker client connected successfully.", zap.String("api-version", ping.APIVersion))
 
 	return &dockerClient{
 		dockerApiClient: dockerApiClient,

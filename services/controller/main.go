@@ -2,10 +2,12 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"os"
 	"os/signal"
 	"syscall"
 
+	"github.com/Marvin9/dophermal/services/controller/shared"
 	"github.com/joho/godotenv"
 	"go.uber.org/zap"
 )
@@ -21,8 +23,10 @@ func main() {
 	err := godotenv.Load()
 
 	if err != nil {
-		panic(err)
+		fmt.Println(err)
 	}
+
+	shared.EnsureEnvironmentVariables()
 
 	svcFactory := NewGlobalServicesFactory()
 
