@@ -24,3 +24,6 @@ build: build-ui build-api build-controller
 
 prod:
 	goreman -set-ports=false start
+
+ssh-ec2:
+	ssh -i dophermal.pem ec2-user@$(EC2_PUBLIC_DNS)

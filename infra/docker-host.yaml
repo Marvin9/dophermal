@@ -6,7 +6,7 @@ Parameters:
     Default: '/aws/service/ami-amazon-linux-latest/al2023-ami-minimal-kernel-default-x86_64'
   PEMKey:
     Type: String
-    Default: temporary-key-value-pair
+    Default: dophermal
     Description: enter PEM key-value pair to attach
 Resources:
   EC2Instance:
@@ -19,10 +19,16 @@ Resources:
           #!/bin/bash
           sudo yum update -y
           sudo yum install -y docker
-          sudo service docker start
+          # sudo service docker start
           sudo usermod -a -G docker ec2-user
+          echo '{ "hosts": [ "tcp://0.0.0.0:2375", "unix:///var/run/docker.sock" ] }' | sudo tee /etc/docker/daemon.json
+          sudo mkdir ~/logs
+          sudo dockerd --debug &> ~/logs/$(date +"%Y-%m-%d_%H-%M-%S").log &
       SecurityGroups:
         - !Ref 'EC2SecurityGroup'
+      Tags:
+        - Key: Name
+          Value: dophermal-host
   # TODO: update security group
   EC2SecurityGroup:
     Type: AWS::EC2::SecurityGroup
