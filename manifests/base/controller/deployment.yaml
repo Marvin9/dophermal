@@ -18,8 +18,8 @@ spec:
       - name: dophermal-controller-image
         image: dophermal-controller-image
         envFrom:
-            - secretRef:
-                name: dophermal-aws-secrets
+          - secretRef:
+              name: dophermal-aws-secrets
         env:
           - name: CONTAINER_LOGS_STREAM_CHUNK_SIZE_IN_BYTES
             value: "1024"
@@ -27,3 +27,5 @@ spec:
             value: "http"
           - name: DOCKER_HOST_INSTANCE_PORT
             value: "2375"
+          - name: ENV
+            value: "development"

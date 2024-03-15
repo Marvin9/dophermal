@@ -65,7 +65,7 @@ func GetContainerLogsBucketName() string {
 	return bucket
 }
 
-func GetDockerHostPublicDns() (*string, error) {
+func GetDockerHostPublicDns() (string, error) {
 	awsConf := GetAWSConf()
 
 	awsCreds := awsConf.Creds
@@ -76,7 +76,7 @@ func GetDockerHostPublicDns() (*string, error) {
 	})
 
 	if err != nil {
-		return aws.String(""), err
+		return "", err
 	}
 
 	ec2Svc := ec2.New(sess)
@@ -93,7 +93,7 @@ func GetDockerHostPublicDns() (*string, error) {
 	})
 
 	if err != nil {
-		return aws.String(""), err
+		return "", err
 	}
 
 	if instances != nil &&
@@ -101,8 +101,9 @@ func GetDockerHostPublicDns() (*string, error) {
 		len(instances.Reservations) > 0 &&
 		instances.Reservations[0].Instances != nil &&
 		len(instances.Reservations[0].Instances) > 0 {
-		return instances.Reservations[0].Instances[0].PublicDnsName, nil
+		dns := *instances.Reservations[0].Instances[0].PublicDnsName
+		return dns, nil
 	}
 
-	return aws.String(""), nil
+	return "", nil
 }

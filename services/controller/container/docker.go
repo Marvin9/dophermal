@@ -29,14 +29,14 @@ func NewDockerContainerClient(logger *zap.Logger) (ContainerClientInterface, err
 		client.FromEnv,
 	}
 
-	if err != nil || dockerHostPublicDns == nil || *dockerHostPublicDns == "" {
-		if dockerHostPublicDns == nil {
+	if err != nil || dockerHostPublicDns == "" {
+		if dockerHostPublicDns == "" {
 			logger.Info("not ec2 instance for docker host found")
 		} else {
 			logger.Error("ec2 instance for docker host error", zap.Error(err))
 		}
 	} else {
-		dockerHostPublicDnsWithProtocol := fmt.Sprintf("%s://%s:%s", os.Getenv("DOCKER_HOST_INSTANCE_PROTOCOL"), *dockerHostPublicDns, os.Getenv("DOCKER_HOST_INSTANCE_PORT"))
+		dockerHostPublicDnsWithProtocol := fmt.Sprintf("%s://%s:%s", os.Getenv("DOCKER_HOST_INSTANCE_PROTOCOL"), dockerHostPublicDns, os.Getenv("DOCKER_HOST_INSTANCE_PORT"))
 
 		logger.Debug("docker host public dns", zap.String("dns", dockerHostPublicDnsWithProtocol))
 
