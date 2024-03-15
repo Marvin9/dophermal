@@ -17,13 +17,13 @@ spec:
       containers:
       - name: dophermal-controller-image
         image: dophermal-controller-image
-      envFrom:
-          - secretRef:
-              name: dophermal-aws-secrets
-      env:
-        - name: CONTAINER_LOGS_STREAM_CHUNK_SIZE_IN_BYTES
-          value: 1024
-        - name: DOCKER_HOST_INSTANCE_PROTOCOL
-          value: http
-        - name: DOCKER_HOST_INSTANCE_PORT
-          value: 2375
+        envFrom:
+            - secretRef:
+                name: dophermal-aws-secrets
+        env:
+          - name: CONTAINER_LOGS_STREAM_CHUNK_SIZE_IN_BYTES
+            value: "1024"
+          - name: DOCKER_HOST_INSTANCE_PROTOCOL
+            value: "http"
+          - name: DOCKER_HOST_INSTANCE_PORT
+            value: "2375"

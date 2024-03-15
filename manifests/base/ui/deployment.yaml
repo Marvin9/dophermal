@@ -19,7 +19,6 @@ spec:
         image: dophermal-ui-image
         ports:
         - containerPort: 80
-          name: dophermal-ui-port
         env:
         - name: VITE_DOPHERMAL_API_HOST
           value: http://api-service.dophermal.svc.cluster.local:8000

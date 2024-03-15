@@ -25,5 +25,3 @@ create_file_recursively() {
 }
 
 create_file_recursively ./db/dophermal.db
-
-sqlite3 ./db/dophermal.db

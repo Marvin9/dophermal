@@ -19,7 +19,6 @@ spec:
         image: dophermal-api-image
         ports:
         - containerPort: 8000
-          name: dophermal-api-port
         env:
           - name: PORT
             value: "8000"

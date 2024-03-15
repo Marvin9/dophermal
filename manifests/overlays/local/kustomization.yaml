@@ -7,17 +7,18 @@ resources:
 
 images:
   - name: dophermal-ui-image
-    newName: mayursiinh/dophermal-ui
+    # k3d-registry.localhost:555 -> check hacks/local-k3d.sh
+    newName: k3d-registry.localhost:5555/dophermal-ui
   - name: dophermal-api-image
-    newName: mayursiinh/dophermal-api
+    newName: k3d-registry.localhost:5555/dophermal-api
   - name: dophermal-controller-image
-    newName: mayursiinh/dophermal-controller
+    newName: k3d-registry.localhost:5555/dophermal-controller
 
-patchesJson6902:
+patches:
   # sqlite volume mount
   - target:
       group: apps
       version: v1
       kind: Deployment
       name: api-development
-    patch: ./sqlite-volume-mount.yaml
+    path: sqlite-volume-mount.yaml
