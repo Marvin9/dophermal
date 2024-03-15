@@ -26,6 +26,6 @@ export default () => ({
     bucketName: process.env.CONTAINER_LOGS_BUCKET_NAME,
   },
   ec2: {
-    dockerHostInstanceName: process.env.DOCKER_HOST_EC2_INSTANCE_NAME,
+    dockerHostInstanceName: process.env.DOCKER_HOST_INSTANCE_NAME,
   },
 });
