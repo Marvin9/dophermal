@@ -2,6 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: ui-deployment
+  namespace: dophermal
   labels:
     component: ui
 spec:
@@ -19,7 +20,3 @@ spec:
         image: dophermal-ui-image
         ports:
         - containerPort: 80
-        env:
-        - name: VITE_DOPHERMAL_API_HOST
-          value: http://api-service.dophermal.svc.cluster.local:8000
-

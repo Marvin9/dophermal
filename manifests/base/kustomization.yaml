@@ -6,3 +6,4 @@ resources:
   - ./api
   - ./controller
   - ./ns.yaml
+  - ./ingress.yaml

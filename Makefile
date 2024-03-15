@@ -34,6 +34,10 @@ ssh-ec2:
 local-k3d:
 	sh ./hacks/local-k3d.sh
 
+destroy-local-k3d:
+	k3d registry delete k3d-registry.localhost
+	k3d cluster delete dophermal
+
 manifest-local: clean-local-db local-db
 	kubectl apply -k manifests/overlays/local
 
@@ -44,5 +48,5 @@ aws-up:
 	aws cloudformation create-stack --stack-name dophermal --template-body file:///$(PWD)/infra/bundle.yaml
 
 aws-destroy:
-	-aws s3 rm s3://dophermal-container-logs/logs --recursive
+	-aws s3 rm s3://dophermal-container-log-dumps/logs --recursive
 	aws cloudformation delete-stack --stack-name dophermal
