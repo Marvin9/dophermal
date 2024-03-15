@@ -15,6 +15,7 @@ api.yaml
 apiVersion: v1
 kind: Secret
 metadata:
+  namespace: dophermal
   name: dophermal-api-secrets
 type: Opaque
 data:
@@ -30,6 +31,7 @@ aws.yaml
 apiVersion: v1
 kind: Secret
 metadata:
+  namespace: dophermal
   name: dophermal-aws-secrets
 type: Opaque
 data:
