@@ -1,0 +1,20 @@
+# COMPONENT
+# apiVersion: apps/v1
+# kind: Deployment
+# metadata:
+#   name: api-deployment
+#   labels:
+#     component: api
+
+- op: add
+  path: /spec/template/spec/containers/0/volumeMounts
+  value:
+    - mountPath: /db
+      name: sqlite
+- op: add
+  path: /spec/template/spec/volumes
+  value:
+  - name: sqlite
+    hostPath:
+    path: /Users/mayursiinh/development/dophermal.nosync/db
+    type: Directory

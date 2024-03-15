@@ -1,0 +1,26 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ui-deployment
+  labels:
+    component: ui
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      component: ui
+  template:
+    metadata:
+      labels:
+        component: ui
+    spec:
+      containers:
+      - name: dophermal-ui-image
+        image: dophermal-ui-image
+        ports:
+        - containerPort: 80
+          name: dophermal-ui-port
+        env:
+        - name: VITE_DOPHERMAL_API_HOST
+          value: http://api-service.dophermal.svc.cluster.local:8000
+

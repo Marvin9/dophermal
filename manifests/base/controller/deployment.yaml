@@ -1,0 +1,24 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: controller-deployment
+  labels:
+    component: controller
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      component: controller
+  template:
+    metadata:
+      labels:
+        component: controller
+    spec:
+      containers:
+      - name: dophermal-controller-image
+        image: dophermal-controller-image
+      envFrom:
+          - secretRef:
+              name: dophermal-controller-secrets
+          - secretRef:
+              name: dophermal-aws-secrets

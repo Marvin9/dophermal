@@ -22,4 +22,7 @@ JWT_SECRET_KEY=local
 # see infra/sqs.yaml
 CONTROLLER_SQS_QUEUE_NAME=ControllerQueue
 STATUS_SQS_QUEUE_NAME=StatusQueue
+
+CONTAINER_LOGS_BUCKET_NAME=dophermal-container-log-dumps
+DOCKER_HOST_EC2_INSTANCE_NAME=dophermal-docker-host
 ```

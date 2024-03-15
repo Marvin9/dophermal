@@ -1,0 +1,30 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: api-deployment
+  labels:
+    component: api
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      component: api
+  template:
+    metadata:
+      labels:
+        component: api
+    spec:
+      containers:
+      - name: dophermal-api-image
+        image: dophermal-api-image
+        ports:
+        - containerPort: 8000
+          name: dophermal-api-port
+        env:
+          - name: PORT
+            value: "8000"
+        envFrom:
+          - secretRef:
+              name: dophermal-api-secrets
+          - secretRef:
+              name: dophermal-aws-secrets
