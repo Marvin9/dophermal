@@ -7,6 +7,7 @@ kind: Kustomization
 
 resources:
   - ./aws.yaml
+  - ./nginx.yaml
 ```
 
 You can generate secret file below by running the command to get the AWS creds from `~/.aws/config`, encode and save in `aws.yaml`
@@ -29,3 +30,21 @@ data:
   AWS_SESSION_TOKEN: 
 ```
 
+You can generate it by command below
+
+```sh
+kubectl create secret tls nginx-tls-secret --namespace=dophermal --cert=tls.crt --key=tls.key --dry-run=client -o yaml > manifests/base/secrets/nginx.yaml
+```
+
+nginx.yaml
+```yaml
+apiVersion: v1
+data:
+  tls.crt: 
+  tls.key: 
+kind: Secret
+metadata:
+  name: nginx-tls-secret
+  namespace: dophermal
+type: kubernetes.io/tls
+```
