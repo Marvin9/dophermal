@@ -1,3 +1,5 @@
+IAM_ROLE_ARN=arn:aws:iam::590183972435:role/LabRole
+
 tools-version:
 	node -v
 	pnpm -v
@@ -45,14 +47,14 @@ rm-manifest-local:
 	kubectl delete -k manifests/overlays/local
 
 aws-up:
-	aws cloudformation create-stack --stack-name dophermal --template-body file:///$(PWD)/infra/bundle.yaml --role-arn arn:aws:iam::590183972435:role/LabRole
+	aws cloudformation create-stack --stack-name dophermal --template-body file:///$(PWD)/infra/bundle.yaml --role-arn ${IAM_ROLE_ARN}
 
 aws-destroy:
 	-aws s3 rm s3://dophermal-container-log-dumps/logs --recursive
 	aws cloudformation delete-stack --stack-name dophermal
 
 eks-storage-class-addon:
-	eksctl create addon --name aws-ebs-csi-driver --cluster dophermal --service-account-role-arn arn:aws:iam::590183972435:role/LabRole --force
+	eksctl create addon --name aws-ebs-csi-driver --cluster dophermal --service-account-role-arn ${IAM_ROLE_ARN} --force
 
 eks-create-cluster:
 	eksctl create cluster -f infra/eksctl.yaml

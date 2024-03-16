@@ -9,6 +9,12 @@ resources:
   - ./aws.yaml
 ```
 
+You can generate secret file below by running the command to get the AWS creds from `~/.aws/config`, encode and save in `aws.yaml`
+
+```sh
+sh hacks/gen-secrets-file-from-aws-conf.sh
+```
+
 aws.yaml
 ```yaml
 apiVersion: v1

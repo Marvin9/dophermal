@@ -21,6 +21,14 @@ data:
         server {
             listen 80;
 
+            return 301 https://$host$request_uri;
+        }
+
+        server {
+            listen 443 ssl;
+            ssl_certificate /etc/nginx/ssl/tls.crt;
+            ssl_certificate_key /etc/nginx/ssl/tls.key;
+
             location /api {
                 proxy_pass http://api-service.dophermal.svc.cluster.local:8000;
                 proxy_set_header Host $host;
@@ -58,15 +66,21 @@ spec:
       - name: nginx
         image: nginx
         ports:
+        - containerPort: 443
         - containerPort: 80
         volumeMounts:
         - name: nginx-config
           mountPath: /etc/nginx/nginx.conf
           subPath: nginx.conf
+        - name: nginx-tls
+          mountPath: /etc/nginx/ssl
       volumes:
       - name: nginx-config
         configMap:
           name: nginx-config
+      - name: nginx-tls
+        secret:
+          secretName: nginx-tls-secret
 ---
 apiVersion: v1
 kind: Service
@@ -78,5 +92,5 @@ spec:
     component: ingress
   ports:
     - protocol: TCP
-      port: 80
-      targetPort: 80
+      port: 443
+      targetPort: 443
