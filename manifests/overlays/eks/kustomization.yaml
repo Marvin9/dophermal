@@ -22,3 +22,9 @@ patches:
       kind: Deployment
       name: api-development
     path: sqlite-volume-mount.yaml
+  # turn nginx load-balancer
+  - target:
+      version: v1
+      kind: Service
+      name: nginx-service
+    path: load-balancer.yaml

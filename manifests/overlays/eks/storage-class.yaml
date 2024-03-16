@@ -3,5 +3,7 @@ kind: StorageClass
 metadata:
   namespace: dophermal
   name: sqlite-storage-class
+  labels:
+    name: sqlite-storage-class
 provisioner: ebs.csi.aws.com
 volumeBindingMode: WaitForFirstConsumer

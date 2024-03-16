@@ -30,7 +30,7 @@ spec:
           - name: SQLITE_DATABASE_PATH
             value: "/dophermal.db"
           - name: AWS_SECRET_NAME
-            value: "prod/dophermal"
+            value: "prod2/dophermal"
         envFrom:
           - secretRef:
               name: dophermal-aws-secrets

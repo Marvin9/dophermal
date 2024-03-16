@@ -1,0 +1,13 @@
+services:
+  ui:
+    image: mayursiinh/dophermal-ui
+    build:
+      context: ./services/ui
+  api:
+    image: mayursiinh/dophermal-api
+    build:
+      context: ./services/api
+  controller:
+    image: mayursiinh/dophermal-controller
+    build:
+      context: ./services/controller

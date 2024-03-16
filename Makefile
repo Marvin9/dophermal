@@ -45,7 +45,7 @@ rm-manifest-local:
 	kubectl delete -k manifests/overlays/local
 
 aws-up:
-	aws cloudformation create-stack --stack-name dophermal --template-body file:///$(PWD)/infra/bundle.yaml
+	aws cloudformation create-stack --stack-name dophermal --template-body file:///$(PWD)/infra/bundle.yaml --role-arn arn:aws:iam::590183972435:role/LabRole
 
 aws-destroy:
 	-aws s3 rm s3://dophermal-container-log-dumps/logs --recursive
@@ -53,3 +53,9 @@ aws-destroy:
 
 eks-storage-class-addon:
 	eksctl create addon --name aws-ebs-csi-driver --cluster dophermal --service-account-role-arn arn:aws:iam::590183972435:role/LabRole --force
+
+eks-create-cluster:
+	eksctl create cluster -f infra/eksctl.yaml
+
+eks-delete-cluster:
+	eksctl delete cluster -f infra/eksctl.yaml --disable-nodegroup-eviction

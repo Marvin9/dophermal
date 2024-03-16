@@ -4,7 +4,9 @@ import {
 } from '@aws-sdk/client-secrets-manager';
 import {ConfigService} from '@nestjs/config';
 
-export default async () => {
+let conf = null;
+
+export const loadEager = async () => {
   const configService = new ConfigService();
 
   const awsConf = {
@@ -15,6 +17,7 @@ export default async () => {
       sessionToken: configService.get('AWS_SESSION_TOKEN'),
     },
   };
+
   const client = new SecretsManagerClient(awsConf);
   try {
     const response = await client.send(
@@ -25,7 +28,7 @@ export default async () => {
 
     const data = JSON.parse(response.SecretString);
 
-    return {
+    conf = {
       port: parseInt(process.env.PORT, 10) || 3000,
       github: {
         client_id: data.GITHUB_OAUTH_CLIENT_ID,
@@ -56,7 +59,11 @@ export default async () => {
         dockerHostInstanceName: data.DOCKER_HOST_INSTANCE_NAME,
       },
     };
+
+    return conf;
   } catch (error) {
     throw error;
   }
 };
+
+export default async () => conf || (await loadEager());

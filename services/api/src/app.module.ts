@@ -49,12 +49,16 @@ import {AwsModule} from './aws/aws.module';
     HttpModule,
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
-      useFactory: async (configService: ConfigService) => ({
-        type: 'sqlite',
-        database: configService.get('database.path'),
-        autoLoadEntities: true,
-        synchronize: true,
-      }),
+      useFactory: async (configService: ConfigService) => {
+        return {
+          type: 'sqlite',
+          database:
+            configService.get('database.path') ||
+            process.env.SQLITE_DATABASE_PATH,
+          autoLoadEntities: true,
+          synchronize: true,
+        };
+      },
       inject: [ConfigService],
     }),
     AuthModule,
