@@ -15,6 +15,10 @@ spec:
       labels:
         component: api
     spec:
+      initContainers:
+      - name: initialize-sqlite
+        image: busybox
+        command: ['sh', '-c', 'touch /dophermal.db']
       containers:
       - name: dophermal-api-image
         image: dophermal-api-image
@@ -23,8 +27,10 @@ spec:
         env:
           - name: PORT
             value: "8000"
+          - name: SQLITE_DATABASE_PATH
+            value: "/dophermal.db"
+          - name: AWS_SECRET_NAME
+            value: "prod/dophermal"
         envFrom:
-          - secretRef:
-              name: dophermal-api-secrets
           - secretRef:
               name: dophermal-aws-secrets

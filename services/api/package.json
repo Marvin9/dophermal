@@ -22,6 +22,7 @@
   "dependencies": {
     "@aws-sdk/client-ec2": "^3.533.0",
     "@aws-sdk/client-s3": "^3.529.1",
+    "@aws-sdk/client-secrets-manager": "^3.535.0",
     "@aws-sdk/client-sqs": "^3.515.0",
     "@aws-sdk/s3-request-presigner": "^3.529.1",
     "@nestjs/axios": "^3.0.1",

@@ -50,3 +50,6 @@ aws-up:
 aws-destroy:
 	-aws s3 rm s3://dophermal-container-log-dumps/logs --recursive
 	aws cloudformation delete-stack --stack-name dophermal
+
+eks-storage-class-addon:
+	eksctl create addon --name aws-ebs-csi-driver --cluster dophermal --service-account-role-arn arn:aws:iam::590183972435:role/LabRole --force

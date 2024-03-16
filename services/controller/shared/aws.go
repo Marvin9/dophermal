@@ -1,6 +1,7 @@
 package shared
 
 import (
+	"encoding/json"
 	"fmt"
 	"os"
 	"strconv"
@@ -9,6 +10,7 @@ import (
 	"github.com/aws/aws-sdk-go/aws/credentials"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/ec2"
+	"github.com/aws/aws-sdk-go/service/secretsmanager"
 )
 
 type AWSStaticCredentials struct {
@@ -65,15 +67,18 @@ func GetContainerLogsBucketName() string {
 	return bucket
 }
 
-func GetDockerHostPublicDns() (string, error) {
+func GetSession() (*session.Session, error) {
 	awsConf := GetAWSConf()
-
 	awsCreds := awsConf.Creds
 
-	sess, err := session.NewSession(&aws.Config{
+	return session.NewSession(&aws.Config{
 		Credentials: credentials.NewStaticCredentials(awsCreds.AccessKeyID, awsCreds.AccessKeySecret, awsCreds.SessionToken),
 		Region:      &awsConf.Region,
 	})
+}
+
+func GetDockerHostPublicDns() (string, error) {
+	sess, err := GetSession()
 
 	if err != nil {
 		return "", err
@@ -106,4 +111,40 @@ func GetDockerHostPublicDns() (string, error) {
 	}
 
 	return "", nil
+}
+
+func PopulateEnvironmentVariablesFromSecretManager() error {
+	secretName := os.Getenv("AWS_SECRET_NAME")
+
+	sess, err := GetSession()
+
+	if err != nil {
+		return err
+	}
+
+	secretsManagerSvc := secretsmanager.New(sess)
+
+	res, err := secretsManagerSvc.GetSecretValue(&secretsmanager.GetSecretValueInput{
+		SecretId: aws.String(secretName),
+	})
+
+	if err != nil {
+		return err
+	}
+
+	secrets := *res.SecretString
+
+	kv := map[string]string{}
+
+	err = json.Unmarshal([]byte(secrets), &kv)
+
+	if err != nil {
+		return err
+	}
+
+	for key, value := range kv {
+		os.Setenv(key, value)
+	}
+
+	return nil
 }

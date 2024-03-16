@@ -1,0 +1,24 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+resources:
+  - ../../base
+  - ./pvc.yaml
+  - ./storage-class.yaml
+
+images:
+  - name: dophermal-ui-image
+    newName: mayursiinh/dophermal-ui
+  - name: dophermal-api-image
+    newName: mayursiinh/dophermal-api
+  - name: dophermal-controller-image
+    newName: mayursiinh/dophermal-controller
+
+patches:
+  # sqlite volume mount
+  - target:
+      group: apps
+      version: v1
+      kind: Deployment
+      name: api-development
+    path: sqlite-volume-mount.yaml

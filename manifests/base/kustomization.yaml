@@ -7,3 +7,4 @@ resources:
   - ./controller
   - ./ns.yaml
   - ./ingress.yaml
+  - ./secrets

@@ -1,4 +1,4 @@
-FROM node:21-slim AS base
+FROM --platform=linux/amd64 node:21-slim AS base
 ENV PNPM_HOME="/pnpm"
 ENV PATH="$PNPM_HOME:$PATH"
 RUN corepack enable
@@ -17,12 +17,12 @@ COPY index.html /app
 
 WORKDIR /app
 
-FROM base AS build
+FROM --platform=linux/amd64 base AS build
 
 RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --frozen-lockfile
 RUN pnpm run build
 
-FROM nginx:1.25.4-alpine
+FROM --platform=linux/amd64 nginx:1.25.4-alpine
 COPY --from=build /app/dist /usr/share/nginx/html
 COPY ./nginx.conf /etc/nginx/conf.d/default.conf
 

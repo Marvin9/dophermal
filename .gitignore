@@ -3,4 +3,6 @@ db
 .env
 bin
 *.pem
+manifests/base/secrets/*.yaml
 manifests/overlays/local/secrets/*.yaml
+manifests/overlays/eks/secrets/*.yaml

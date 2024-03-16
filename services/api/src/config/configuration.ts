@@ -1,31 +1,62 @@
-export default () => ({
-  port: parseInt(process.env.PORT, 10) || 3000,
-  github: {
-    client_id: process.env.GITHUB_OAUTH_CLIENT_ID,
-    client_secret: process.env.GITHUB_OAUTH_SECRET,
-    callback_url: process.env.GITHUB_OAUTH_CALLBACK_URL,
-  },
-  database: {
-    path: process.env.SQLITE_DATABASE_PATH,
-  },
-  jwt: {
-    secret: process.env.JWT_SECRET_KEY,
-  },
-  aws: {
-    region: process.env.AWS_REGION,
-    accessKeyId: process.env.AWS_ACCESS_KEY_ID,
-    accessKeySecret: process.env.AWS_SECRET_ACCESS_KEY,
-    sessionToken: process.env.AWS_SESSION_TOKEN,
-  },
-  sqs: {
-    controllerQueue: process.env.CONTROLLER_SQS_QUEUE_NAME,
-    statusQueue: process.env.STATUS_SQS_QUEUE_NAME,
-    disable: false,
-  },
-  s3: {
-    bucketName: process.env.CONTAINER_LOGS_BUCKET_NAME,
-  },
-  ec2: {
-    dockerHostInstanceName: process.env.DOCKER_HOST_INSTANCE_NAME,
-  },
-});
+import {
+  SecretsManagerClient,
+  GetSecretValueCommand,
+} from '@aws-sdk/client-secrets-manager';
+import {ConfigService} from '@nestjs/config';
+
+export default async () => {
+  const configService = new ConfigService();
+
+  const awsConf = {
+    region: configService.get('AWS_REGION'),
+    credentials: {
+      accessKeyId: configService.get('AWS_ACCESS_KEY_ID'),
+      secretAccessKey: configService.get('AWS_SECRET_ACCESS_KEY'),
+      sessionToken: configService.get('AWS_SESSION_TOKEN'),
+    },
+  };
+  const client = new SecretsManagerClient(awsConf);
+  try {
+    const response = await client.send(
+      new GetSecretValueCommand({
+        SecretId: configService.get('AWS_SECRET_NAME'),
+      }),
+    );
+
+    const data = JSON.parse(response.SecretString);
+
+    return {
+      port: parseInt(process.env.PORT, 10) || 3000,
+      github: {
+        client_id: data.GITHUB_OAUTH_CLIENT_ID,
+        client_secret: data.GITHUB_OAUTH_SECRET,
+        callback_url: data.GITHUB_OAUTH_CALLBACK_URL,
+      },
+      database: {
+        path: process.env.SQLITE_DATABASE_PATH,
+      },
+      jwt: {
+        secret: data.JWT_SECRET_KEY,
+      },
+      aws: {
+        region: data.AWS_REGION,
+        accessKeyId: data.AWS_ACCESS_KEY_ID,
+        accessKeySecret: data.AWS_SECRET_ACCESS_KEY,
+        sessionToken: data.AWS_SESSION_TOKEN,
+      },
+      sqs: {
+        controllerQueue: data.CONTROLLER_SQS_QUEUE_NAME,
+        statusQueue: data.STATUS_SQS_QUEUE_NAME,
+        disable: false,
+      },
+      s3: {
+        bucketName: data.CONTAINER_LOGS_BUCKET_NAME,
+      },
+      ec2: {
+        dockerHostInstanceName: data.DOCKER_HOST_INSTANCE_NAME,
+      },
+    };
+  } catch (error) {
+    throw error;
+  }
+};

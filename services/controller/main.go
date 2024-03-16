@@ -26,6 +26,12 @@ func main() {
 		fmt.Println(err)
 	}
 
+	err = shared.PopulateEnvironmentVariablesFromSecretManager()
+
+	if err != nil {
+		fmt.Println(err)
+	}
+
 	shared.EnsureEnvironmentVariables()
 
 	svcFactory := NewGlobalServicesFactory()

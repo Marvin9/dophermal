@@ -22,6 +22,8 @@ spec:
           - secretRef:
               name: dophermal-aws-secrets
         env:
+          - name: AWS_SECRET_NAME
+            value: "prod/dophermal"
           - name: CONTAINER_LOGS_STREAM_CHUNK_SIZE_IN_BYTES
             value: "1024"
           - name: DOCKER_HOST_INSTANCE_PROTOCOL
