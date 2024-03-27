@@ -12,6 +12,7 @@ import {
 } from '@ui/components/shared/ui/card';
 import {cn} from '@ui/lib/utils';
 import {CaretRightIcon} from '@radix-ui/react-icons';
+import {NotFound} from '@ui/components/shared/not-found';
 
 const Repo = () => {
   const navigate = useNavigate();
@@ -36,6 +37,9 @@ const Repo = () => {
     <div>
       <h2 className="text-2xl font-semibold">{repoData?.full_name}</h2>
       <div className={cn('mt-10')}>
+        {repoPr?.length == 0 && (
+          <NotFound text="No open PR found in this repository" />
+        )}
         {repoPr?.map((pr) => (
           <Card
             key={pr.id}

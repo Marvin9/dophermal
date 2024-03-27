@@ -59,29 +59,31 @@ const Dashboard = () => {
           onChange={(e) => setSearch(e.target.value)}
           placeholder="search repo"
         />
-        {filteredRepos?.map((repo, idx) => (
-          <Card key={idx} className={styles.repo}>
-            <CardHeader>
-              <CardTitle>{repo.name}</CardTitle>
-              <CardDescription>{repo.full_name}</CardDescription>
-            </CardHeader>
-            <CardContent className="mt-auto">
-              <Button
-                variant="outline"
-                onClick={() => {
-                  const [owner, repoName] = repo.full_name.split('/');
-                  navigate({
-                    to: '/dashboard/repo/$owner/$repoName',
-                    params: {owner, repoName},
-                  });
-                }}
-              >
-                <PlusIcon className="mr-2" />
-                Select
-              </Button>
-            </CardContent>
-          </Card>
-        ))}
+        <div className={clsx(styles.repos, 'my-5')}>
+          {filteredRepos?.map((repo, idx) => (
+            <Card key={idx} className={styles.repo}>
+              <CardHeader>
+                <CardTitle>{repo.name}</CardTitle>
+                <CardDescription>{repo.full_name}</CardDescription>
+              </CardHeader>
+              <CardContent className="mt-auto">
+                <Button
+                  variant="outline"
+                  onClick={() => {
+                    const [owner, repoName] = repo.full_name.split('/');
+                    navigate({
+                      to: '/dashboard/repo/$owner/$repoName',
+                      params: {owner, repoName},
+                    });
+                  }}
+                >
+                  <PlusIcon className="mr-2" />
+                  Select
+                </Button>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
       </>
     );
   }
@@ -89,7 +91,7 @@ const Dashboard = () => {
   return (
     <>
       {Info}
-      <div className={clsx(styles.repos, 'my-5')}>{Repos}</div>
+      <div className={clsx('my-5')}>{Repos}</div>
     </>
   );
 };

@@ -3,7 +3,6 @@ import {useMutation, useQuery} from '@tanstack/react-query';
 import {queries} from '@ui/api/queries';
 import {Spinner} from './shared/spinner';
 import NoDataIcon from '@ui/assets/no-data.svg';
-import ContainerIcon from '@ui/assets/container.svg';
 import {Card, CardDescription, CardHeader, CardTitle} from './shared/ui/card';
 import {
   Tooltip,
@@ -30,6 +29,7 @@ import {useUserStore} from '@ui/state/user';
 import {Link} from '@tanstack/react-router';
 import {useMemo} from 'react';
 import {queryClient} from '@ui/api/client';
+import {NotFound} from './shared/not-found';
 
 export type EphermalEnvironmentListProps = {
   ephermalEnv: ContainerImage[];
@@ -110,16 +110,7 @@ export const EphermalEnvironmentList = (
   }, [dockerHostDns, selectedEphermalPayload]);
 
   if (!ephermalEnv?.length) {
-    return (
-      <div className="flex w-full h-full items-center justify-center">
-        <div>
-          <img src={ContainerIcon} alt="container" className="w-96" />
-          <h4 className="text-center mt-10 font-light text-lg">
-            No ephermal found.
-          </h4>
-        </div>
-      </div>
-    );
+    return <NotFound />;
   }
 
   return (

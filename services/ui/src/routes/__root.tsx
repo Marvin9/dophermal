@@ -8,7 +8,7 @@ const Root = () => {
       <Outlet />
       <Toaster />
       {/* TODO */}
-      <TanStackRouterDevtools />
+      {import.meta.env.MODE === 'development' && <TanStackRouterDevtools />}
     </>
   );
 };
