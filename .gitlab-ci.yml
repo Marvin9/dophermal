@@ -41,7 +41,7 @@ build-and-lint-api:
       - .pnpm-store
 
 build-controller:
-  stage: build
+  stage: build-and-lint
   image: golang:latest
   script:
     - make build-controller
