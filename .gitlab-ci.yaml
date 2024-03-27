@@ -1,0 +1,47 @@
+stages:
+  - build-and-lint
+  - deploy
+
+build-and-lint-ui:
+  stage: build-and-lint
+  image: node:21.7.1
+  before_script:
+    - corepack enable
+    - corepack prepare pnpm@latest-8 --activate
+    - pnpm config set store-dir .pnpm-store
+  script:
+    - cd services/ui
+    - pnpm install
+    - pnpm lint
+    - pnpm build
+  cache:
+    key:
+      files:
+        - pnpm-lock.yaml
+    paths:
+      - .pnpm-store
+
+build-and-lint-api:
+  stage: build-and-lint
+  image: node:21.7.1
+  before_script:
+    - corepack enable
+    - corepack prepare pnpm@latest-8 --activate
+    - pnpm config set store-dir .pnpm-store
+  script:
+    - cd services/api
+    - pnpm install
+    - pnpm lint
+    - pnpm build
+  cache:
+    key:
+      files:
+        - pnpm-lock.yaml
+    paths:
+      - .pnpm-store
+
+build-controller:
+  stage: build
+  image: golang:latest
+  script:
+    - make build-controller
