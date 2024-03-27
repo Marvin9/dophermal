@@ -1,4 +1,4 @@
-import {Controller, Get, Param} from '@nestjs/common';
+import {Controller, Get, Logger, Param} from '@nestjs/common';
 import {request} from '@octokit/request';
 import {JWTExtractDto} from 'src/auth/jwt-dto.dto';
 import {JWTExtractData} from 'src/auth/jwt.decorator';
@@ -6,20 +6,45 @@ import {GithubPullRequest, GithubRepo} from './github.entity';
 
 @Controller('github')
 export class GithubController {
+  private logger = new Logger(GithubController.name);
   constructor() {}
 
   @Get('repos')
   async getRepos(@JWTExtractData() userData: JWTExtractDto) {
-    const {data} = await request(`GET /users/{username}/repos`, {
+    const {data} = await request(`GET /user/repos`, {
       headers: {
         authorization: `token ${userData.githubAccessToken}`,
       },
       username: userData.username,
       type: 'all',
       sort: 'created',
+      per_page: 10,
     });
 
-    return data?.map((repo) => {
+    const filteredRepo: typeof data = [];
+
+    for (const repo of data) {
+      try {
+        const {data: lang} = await request(
+          'GET /repos/{owner}/{repo}/languages',
+          {
+            headers: {
+              authorization: `token ${userData.githubAccessToken}`,
+            },
+            owner: repo.owner.login,
+            repo: repo.name,
+          },
+        );
+
+        if (Boolean(lang.Dockerfile)) {
+          filteredRepo.push(repo);
+        }
+      } catch (e) {
+        this.logger.error(`getting language of repo ${repo.full_name}:\n${e}`);
+      }
+    }
+
+    return filteredRepo.map((repo) => {
       const repoDto = new GithubRepo();
 
       repoDto.id = repo.id;
