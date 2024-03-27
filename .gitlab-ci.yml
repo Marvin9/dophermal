@@ -20,6 +20,9 @@ build-and-lint-ui:
         - pnpm-lock.yaml
     paths:
       - .pnpm-store
+  only:
+    changes:
+      - services/ui/**
 
 build-and-lint-api:
   stage: build-and-lint
@@ -39,9 +42,15 @@ build-and-lint-api:
         - pnpm-lock.yaml
     paths:
       - .pnpm-store
+  only:
+    changes:
+      - services/api/**
 
 build-controller:
   stage: build-and-lint
   image: golang:latest
   script:
     - make build-controller
+  only:
+    changes:
+      - services/controller/**
