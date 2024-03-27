@@ -37,7 +37,7 @@ const Callback = () => {
       consumedCode.current = true;
       generateTokenFromAuthCode(code);
     }
-  }, [code]);
+  }, [code, generateTokenFromAuthCode]);
 
   return (
     <div className="flex items-center justify-center w-screen h-screen text-3xl bg-card-foreground text-white">
