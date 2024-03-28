@@ -66,7 +66,7 @@ deploy-ui-image:
     - dalfcs_gitlab_docker_ci
   services:
     - name: docker:dind
-      entrypoint: ["dockerd-entrypoint.sh", "--tls=false"]
+      command: ["--tls=false"]
   stage: deploy
   image: docker:cli
   variables:
@@ -91,7 +91,7 @@ deploy-api-image:
     - dalfcs_gitlab_docker_ci
   services:
     - name: docker:dind
-      entrypoint: ["dockerd-entrypoint.sh", "--tls=false"]
+      command: ["--tls=false"]
   stage: deploy
   image: docker:cli
   variables:
@@ -116,7 +116,7 @@ deploy-controller-image:
     - dalfcs_gitlab_docker_ci
   services:
     - name: docker:dind
-      entrypoint: ["dockerd-entrypoint.sh", "--tls=false"]
+      command: ["--tls=false"]
   stage: deploy
   image: docker:cli
   variables:
