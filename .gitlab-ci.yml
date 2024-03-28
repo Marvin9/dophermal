@@ -4,7 +4,7 @@ stages:
 
 build-and-lint-ui:
   tags:
-    - grad
+    - dalfcs_gitlab_docker_ci
   stage: build-and-lint
   image: node:21.7.1
   before_script:
@@ -28,7 +28,7 @@ build-and-lint-ui:
 
 build-and-lint-api:
   tags:
-    - grad
+    - dalfcs_gitlab_docker_ci
   stage: build-and-lint
   image: node:21.7.1
   before_script:
@@ -52,7 +52,7 @@ build-and-lint-api:
 
 build-controller:
   tags:
-    - grad
+    - dalfcs_gitlab_docker_ci
   stage: build-and-lint
   image: golang:latest
   script:
@@ -63,7 +63,7 @@ build-controller:
 
 deploy-ui-image:
   tags:
-    - grad
+    - dalfcs_gitlab_docker_ci
   stage: deploy
   image: docker:cli
   services:
@@ -86,7 +86,7 @@ deploy-ui-image:
 
 deploy-api-image:
   tags:
-    - grad
+    - dalfcs_gitlab_docker_ci
   stage: deploy
   image: docker:cli
   services:
@@ -109,7 +109,7 @@ deploy-api-image:
 
 deploy-controller-image:
   tags:
-    - grad
+    - dalfcs_gitlab_docker_ci
   stage: deploy
   image: docker:cli
   services:
