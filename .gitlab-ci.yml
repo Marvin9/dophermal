@@ -64,6 +64,8 @@ build-controller:
 deploy-ui-image:
   tags:
     - dalfcs_gitlab_docker_ci
+  services:
+    - docker:dind
   stage: deploy
   image: docker:cli
   variables:
@@ -85,6 +87,8 @@ deploy-ui-image:
 deploy-api-image:
   tags:
     - dalfcs_gitlab_docker_ci
+  services:
+    - docker:dind
   stage: deploy
   image: docker:cli
   variables:
@@ -106,6 +110,8 @@ deploy-api-image:
 deploy-controller-image:
   tags:
     - dalfcs_gitlab_docker_ci
+  services:
+    - docker:dind
   stage: deploy
   image: docker:cli
   variables:
