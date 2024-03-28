@@ -71,6 +71,7 @@ deploy-ui-image:
   image: docker:cli
   variables:
     DOCKER_IMAGE_NAME: $CI_REGISTRY_UI_IMAGE:$CI_COMMIT_REF_SLUG
+    DOCKER_HOST: tcp://localhost:2375
   before_script:
     - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" $CI_REGISTRY
   script:
@@ -95,6 +96,7 @@ deploy-api-image:
   image: docker:cli
   variables:
     DOCKER_IMAGE_NAME: $CI_REGISTRY_API_IMAGE:$CI_COMMIT_REF_SLUG
+    DOCKER_HOST: tcp://localhost:2375
   before_script:
     - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" $CI_REGISTRY
   script:
@@ -119,6 +121,7 @@ deploy-controller-image:
   image: docker:cli
   variables:
     DOCKER_IMAGE_NAME: $CI_REGISTRY_CONTROLLER_IMAGE:$CI_COMMIT_REF_SLUG
+    DOCKER_HOST: tcp://localhost:2375
   before_script:
     - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" $CI_REGISTRY
   script:
