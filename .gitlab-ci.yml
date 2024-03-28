@@ -66,8 +66,6 @@ deploy-ui-image:
     - dalfcs_gitlab_docker_ci
   stage: deploy
   image: docker:cli
-  services:
-    - docker:dind
   variables:
     DOCKER_IMAGE_NAME: $CI_REGISTRY_UI_IMAGE:$CI_COMMIT_REF_SLUG
   before_script:
@@ -89,8 +87,6 @@ deploy-api-image:
     - dalfcs_gitlab_docker_ci
   stage: deploy
   image: docker:cli
-  services:
-    - docker:dind
   variables:
     DOCKER_IMAGE_NAME: $CI_REGISTRY_API_IMAGE:$CI_COMMIT_REF_SLUG
   before_script:
@@ -112,8 +108,6 @@ deploy-controller-image:
     - dalfcs_gitlab_docker_ci
   stage: deploy
   image: docker:cli
-  services:
-    - docker:dind
   variables:
     DOCKER_IMAGE_NAME: $CI_REGISTRY_CONTROLLER_IMAGE:$CI_COMMIT_REF_SLUG
   before_script:
