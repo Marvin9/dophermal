@@ -1,6 +1,6 @@
 stages:
-  # - build-and-lint
   - deploy
+  - build-and-lint
 
 build-and-lint-ui:
   tags:
