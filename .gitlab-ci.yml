@@ -82,7 +82,7 @@ deploy-ui-image:
       fi
   only:
     changes:
-      - services/ui/Dockerfile
+      - services/ui/**
 
 deploy-api-image:
   tags:
@@ -105,7 +105,7 @@ deploy-api-image:
       fi
   only:
     changes:
-      - services/api/Dockerfile
+      - services/api/**
 
 deploy-controller-image:
   tags:
@@ -128,4 +128,4 @@ deploy-controller-image:
       fi
   only:
     changes:
-      - services/controller/Dockerfile
+      - services/controller/**
