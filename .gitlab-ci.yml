@@ -1,6 +1,6 @@
 stages:
-  - deploy
   - build-and-lint
+  - deploy
 
 build-and-lint-ui:
   tags:
@@ -82,7 +82,7 @@ deploy-ui-image:
     - docker push "$DOCKER_IMAGE_NAME"
     - |
       if [[ "$CI_COMMIT_BRANCH" == "$CI_DEFAULT_BRANCH" ]]; then
-        docker tag "$DOCKER_IMAGE_NAME" "$CI_REGISTRY_IMAGE:latest"
+        docker tag "$DOCKER_IMAGE_NAME" "$CI_REGISTRY_UI_IMAGE:latest"
         docker push "$CI_REGISTRY_UI_IMAGE:latest"
       fi
   only:
@@ -110,7 +110,7 @@ deploy-api-image:
     - docker push "$DOCKER_IMAGE_NAME"
     - |
       if [[ "$CI_COMMIT_BRANCH" == "$CI_DEFAULT_BRANCH" ]]; then
-        docker tag "$DOCKER_IMAGE_NAME" "$CI_REGISTRY_IMAGE:latest"
+        docker tag "$DOCKER_IMAGE_NAME" "$CI_REGISTRY_API_IMAGE:latest"
         docker push "$CI_REGISTRY_API_IMAGE:latest"
       fi
   only:
@@ -138,7 +138,7 @@ deploy-controller-image:
     - docker push "$DOCKER_IMAGE_NAME"
     - |
       if [[ "$CI_COMMIT_BRANCH" == "$CI_DEFAULT_BRANCH" ]]; then
-        docker tag "$DOCKER_IMAGE_NAME" "$CI_REGISTRY_IMAGE:latest"
+        docker tag "$DOCKER_IMAGE_NAME" "$CI_REGISTRY_CONTROLLER_IMAGE:latest"
         docker push "$CI_REGISTRY_CONTROLLER_IMAGE:latest"
       fi
   only:
