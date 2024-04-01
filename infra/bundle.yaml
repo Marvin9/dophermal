@@ -81,16 +81,73 @@ Resources:
           echo '{ "hosts": [ "tcp://0.0.0.0:2375", "unix:///var/run/docker.sock" ] }' | sudo tee /etc/docker/daemon.json
           sudo mkdir ~/logs
           sudo dockerd --debug &> ~/logs/$(date +"%Y-%m-%d_%H-%M-%S").log &
-      SecurityGroups:
+      SubnetId: !Ref PublicSubnet
+      SecurityGroupIds:
         - !Ref 'EC2SecurityGroup'
       Tags:
         - Key: Name
           Value: !Ref InstanceName
-  # TODO: update security group
+
+  VPC:
+    Type: AWS::EC2::VPC
+    Properties:
+      CidrBlock: 10.0.0.0/16
+      EnableDnsSupport: true
+      EnableDnsHostnames: true
+      Tags:
+        - Key: Name
+          Value: DophermalVPC
+  
+  InternetGateway:
+    Type: AWS::EC2::InternetGateway
+
+  AttachGateway:
+    Type: AWS::EC2::VPCGatewayAttachment
+    Properties:
+      VpcId: !Ref VPC
+      InternetGatewayId: !Ref InternetGateway
+
+  PublicRouteTable:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId: !Ref VPC
+
+  DefaultRoute:
+    Type: AWS::EC2::Route
+    DependsOn: AttachGateway
+    Properties:
+      RouteTableId: !Ref PublicRouteTable
+      DestinationCidrBlock: 0.0.0.0/0
+      GatewayId: !Ref InternetGateway
+
+  SubnetRouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId: !Ref PublicSubnet
+      RouteTableId: !Ref PublicRouteTable
+
+  PublicSubnet:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref VPC
+      CidrBlock: 10.0.0.0/24
+      MapPublicIpOnLaunch: true
+
   EC2SecurityGroup:
     Type: AWS::EC2::SecurityGroup
     Properties:
-      GroupDescription: Allow all inbound and outbound traffic
+      GroupDescription: Deny inbound traffic on port 2375 from outside VPC and allow 8000 to 9000 port public access and allow ssh
+      VpcId: !Ref VPC
       SecurityGroupIngress:
-      - CidrIp: 0.0.0.0/0
-        IpProtocol: "-1"
+        - CidrIp: 0.0.0.0/0
+          FromPort: 22
+          ToPort: 22
+          IpProtocol: tcp
+        - CidrIp: 10.0.0.0/16
+          FromPort: 2375
+          ToPort: 2375
+          IpProtocol: tcp
+        - CidrIp: 0.0.0.0/0
+          FromPort: 8000
+          ToPort: 9000
+          IpProtocol: tcp
