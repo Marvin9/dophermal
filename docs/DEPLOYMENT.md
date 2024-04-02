@@ -73,22 +73,34 @@ data:
 
 Set `IAM_ROLE_ARN` in [Makefile](../Makefile) to service account role ARN for EKS and Cloudformation.
 
+- Create core resources.
+
+- This includes EC2, SQS, S3, VPC.
+
+```sh
+make aws-up
+```
+
+- Wait until these resources are created.
+
+```sh
+aws cloudformation describe-stacks --stack-name "dophermal" | grep StackStatus
+```
+
+- EKS resources depends on the VPC created by `dophermal` stack.
+
 - Create EKS cluster. This will take 10-15 minutes.
 
 ```sh
 make eks-create-cluster
 ```
 
+> NOTE: This will generate `infra/eksctl-prod.yaml` file that includes VPC and Subnet Ids
+
 - eksctl will populate your kubeconfig to point to EKS. To check, run this
 
 ```sh
 kubectx
-```
-
-- You can create other resources in parallel.
-
-```sh
-make aws-up
 ```
 
 - Check status of EKS stack and our cloudformation stack.

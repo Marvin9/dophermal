@@ -9,3 +9,4 @@ manifests/overlays/eks/secrets/*.yaml
 tls.crt
 tls.csr
 tls.key
+eksctl-prod.yaml

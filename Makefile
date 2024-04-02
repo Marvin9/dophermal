@@ -57,7 +57,9 @@ eks-storage-class-addon:
 	eksctl create addon --name aws-ebs-csi-driver --cluster dophermal --service-account-role-arn ${IAM_ROLE_ARN} --force
 
 eks-create-cluster:
-	eksctl create cluster -f infra/eksctl.yaml
+	# extract vpc info from `aws-up` output
+	sh hacks/patch-eksctl-prod-vpc.sh
+	eksctl create cluster -f infra/eksctl-prod.yaml
 
 eks-delete-cluster:
 	eksctl delete cluster -f infra/eksctl.yaml --disable-nodegroup-eviction
