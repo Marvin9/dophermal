@@ -120,18 +120,46 @@ Resources:
       DestinationCidrBlock: 0.0.0.0/0
       GatewayId: !Ref InternetGateway
 
+  PublicSubnet:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref VPC
+      CidrBlock: 10.0.128.0/17
+      MapPublicIpOnLaunch: true
+
+  PublicSubnetUSEast1a:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref VPC
+      CidrBlock: 10.0.0.0/18
+      MapPublicIpOnLaunch: true
+      AvailabilityZone: us-east-1a
+
+  PublicSubnetUSEast1b:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref VPC
+      CidrBlock: 10.0.64.0/18
+      MapPublicIpOnLaunch: true
+      AvailabilityZone: us-east-1b
+
   SubnetRouteTableAssociation:
     Type: AWS::EC2::SubnetRouteTableAssociation
     Properties:
       SubnetId: !Ref PublicSubnet
       RouteTableId: !Ref PublicRouteTable
 
-  PublicSubnet:
-    Type: AWS::EC2::Subnet
+  SubnetUSEast1aRouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
     Properties:
-      VpcId: !Ref VPC
-      CidrBlock: 10.0.0.0/24
-      MapPublicIpOnLaunch: true
+      SubnetId: !Ref PublicSubnetUSEast1a
+      RouteTableId: !Ref PublicRouteTable
+
+  SubnetUSEast1bRouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId: !Ref PublicSubnetUSEast1b
+      RouteTableId: !Ref PublicRouteTable
 
   EC2SecurityGroup:
     Type: AWS::EC2::SecurityGroup
@@ -151,3 +179,20 @@ Resources:
           FromPort: 8000
           ToPort: 9000
           IpProtocol: tcp
+
+Outputs:
+  VPCId:
+    Description: VPC ID
+    Value: !Ref VPC
+    Export:
+      Name: VPCId
+  PublicSubnetUSEast1a:
+    Description: Public Subnet ID for EKS us-east-1a
+    Value: !Ref PublicSubnetUSEast1a
+    Export:
+      Name: PublicSubnetUSEast1aId
+  PublicSubnetUSEast1b:
+    Description: Public Subnet for EKS us-east-1b
+    Value: !Ref PublicSubnetUSEast1b
+    Export:
+      Name: PublicSubnetUSEast1bId
