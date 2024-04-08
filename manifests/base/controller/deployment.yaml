@@ -30,3 +30,5 @@ spec:
             value: "2375"
           - name: ENV
             value: "development"
+          - name: AWS_SECRET_NAME
+            value: "prod2/dophermal"
