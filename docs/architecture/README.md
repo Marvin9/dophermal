@@ -16,8 +16,4 @@ Keeps users data and active repositories, status, logs and correct pointer to he
 
 ## Controller
 
-Responsible to control docker daemon in EC2 instance. It keeps and updates docker state in redis.
-
-## Redis
-
-Keep the status of the job, PORT of the process, timestamps. It also keeps the available docker daemons and its access endpoint.
+Responsible to control docker daemon in EC2 instance. It forwards updates container state via SQS.
