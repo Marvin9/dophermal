@@ -6,6 +6,9 @@
 
 > CSCI 5409 Cloud Computing Term Assignment
 
+![](./assets/_1.png)
+![](./assets/_2.png)
+
 ### Project By
 
 - Mayursinh Sarvaiya - may.ur.sinh@dal.ca, mayursiinh@gmail.com
